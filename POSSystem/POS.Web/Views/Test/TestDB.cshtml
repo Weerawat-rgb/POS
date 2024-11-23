@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "ทดสอบฐานข้อมูล";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>สถานะการเชื่อมต่อฐานข้อมูล</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert @(ViewBag.Status.Contains("สำเร็จ") ? "alert-success" : "alert-danger")">
+                @ViewBag.Status
+            </div>
+
+            @if (ViewBag.ProductCount != null)
+            {
+                <div class="mt-3">
+                    <h5>จำนวนสินค้าทั้งหมด: @ViewBag.ProductCount รายการ</h5>
+                </div>
+            }
+
+            @if (ViewBag.Products != null)
+            {
+                <div class="mt-3">
+                    <h5>ตัวอย่างสินค้า:</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>รหัส</th>
+                                <th>ชื่อสินค้า</th>
+                                <th>ราคา</th>
+                                <th>หมวดหมู่</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in ViewBag.Products)
+                            {
+                                <tr>
+                                    <td>@product.Id</td>
+                                    <td>@product.Name</td>
+                                    <td>@product.Price.ToString("N2")</td>
+                                    <td>@product.CategoryName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

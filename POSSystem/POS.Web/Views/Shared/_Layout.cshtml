@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - POS System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sale.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/product.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">POS System</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Sale" asp-action="Index">
+                                <strong>🛍️ ขายสินค้า</strong>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Product" asp-action="Index">สินค้า</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Report" asp-action="Index">รายงาน</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - POS System
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+@section Styles {
+    <style>
+        .bill-header {
+            background: linear-gradient(45deg, #20c997, #28a745);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 0;
+        }
+
+        /* ตารางสินค้า */
+        .receipt-table {
+            font-size: 0.9rem;
+        }
+
+        .receipt-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .receipt-table td {
+            vertical-align: middle;
+        }
+
+        /* ช่องรับเงิน */
+        #received {
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 50px;
+            text-align: right;
+            background-color: #e8f5e9;
+        }
+
+        /* เงินทอน */
+        #change {
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 50px;
+            text-align: right;
+            background-color: #ffebee;
+        }
+
+        /* ปุ่มชำระเงิน */
+        #paymentBtn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            font-size: 1.2rem;
+            padding: 15px;
+        }
+
+        #paymentBtn:hover {
+            background: linear-gradient(45deg, #218838, #1e7e34);
+        }
+
+        /* ปุ่มยกเลิก */
+        #cancelBtn {
+            font-size: 1.1rem;
+            padding: 12px;
+        }
+
+        /* Card สำหรับใบเสร็จ */
+        .receipt-card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+
+        /* Input จำนวนสินค้า */
+        .quantity-input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        /* ปุ่มลบรายการ */
+        .remove-item {
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .remove-item:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* ส่วนแสดงผลรวม */
+        .total-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .total-section .row {
+            margin-bottom: 8px;
+        }
+
+        .total-section .total-amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ส่วนค้นหาสินค้า */
+        #barcodeInput {
+            height: 45px;
+            font-size: 1.1rem;
+            border-radius: 4px 0 0 4px;
+        }
+
+        #searchBtn {
+            height: 45px;
+            font-size: 1.1rem;
+            background-color: #f8f9fa;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Table Header */
+        .table-header {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        /* จำนวนเงิน */
+        .money-text {
+            font-family: 'Consolas', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .status-bar .date-time {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+}

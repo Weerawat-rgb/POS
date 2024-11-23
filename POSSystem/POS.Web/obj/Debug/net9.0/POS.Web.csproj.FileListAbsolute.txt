@@ -1,0 +1,7 @@
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.GeneratedMSBuildEditorConfig.editorconfig
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.AssemblyInfoInputs.cache
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.AssemblyInfo.cs
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.csproj.CoreCompileInputs.cache
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.MvcApplicationPartsAssemblyInfo.cache
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.RazorAssemblyInfo.cache
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net9.0\POS.Web.RazorAssemblyInfo.cs

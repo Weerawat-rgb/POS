@@ -1,0 +1,77 @@
+/* ตารางสินค้า */
+.table {
+    font-size: 0.9rem;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* ช่องค้นหา */
+#searchInput {
+    border-radius: 20px;
+    padding-left: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23adb5bd' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+
+/* Badge สำหรับสต็อก */
+.badge {
+    font-size: 0.85rem;
+    padding: 0.35em 0.65em;
+}
+
+/* ปุ่มการจัดการ */
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    margin: 0 2px;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Animation */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal หมวดหมู่ */
+#categoryModal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+#categoryForm {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+}
+
+.category-edit {
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* ปรับขนาดปุ่มในตารางหมวดหมู่ */
+#categoryTable .btn-sm {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+}
