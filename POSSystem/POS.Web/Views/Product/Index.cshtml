@@ -6,7 +6,32 @@
 }
 
 <div class="container-fluid">
-    <!-- หัวข้อและปุ่มดำเนินการ -->
+        <!-- ส่วนค้นหาและกรอง -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        @* <span class="input-group-text">🔍</span> *@
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="ค้นหาสินค้า..." oninput="filterProducts()">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <!-- ส่วนของ dropdown หมวดหมู่ -->
+                    <select class="form-select" id="categoryFilter">
+                        <option value="">ทั้งหมด</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ส่วนหัวตาราง -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>📦 จัดการสินค้า</h2>
         <div class="btn-group">
@@ -16,65 +41,73 @@
             <button class="btn btn-primary" onclick="showAddModal()">
                 ➕ เพิ่มสินค้า
             </button>
+            <button class="btn btn-outline-success me-2" onclick="exportTemplate()">
+            📥 ดาวน์โหลด
+            </button>
+            <button class="btn btn-outline-primary me-2" onclick="document.getElementById('importFile').click()">
+            📤 นำเข้าสินค้า
+            </button>
         </div>
+        <input type="file" id="importFile" accept=".xlsx" style="display: none;" onchange="importExcel(this)" />
     </div>
 
-    <!-- การ์ดแสดงข้อมูล -->
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>รูปภาพ</th>
-                    <th>บาร์โค้ด</th>
-                    <th>ชื่อสินค้า</th>
-                    <th>หมวดหมู่</th>
-                    <th class="text-end">ราคา</th>
-                    <th class="text-center">คงเหลือ</th>
-                    <th class="text-center">สถานะ</th>
-                    <th class="text-end">จัดการ</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    <!-- ตารางสินค้า -->
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
                     <tr>
-                        <td>
-                            @if (!string.IsNullOrEmpty(item.ImageBase64))
-                            {
-                                <img src="data:@item.ImageType;base64,@item.ImageBase64" 
-                                    alt="@item.Name" class="product-image" />
-                            }
-                        </td>
-                        <td>@item.Barcode</td>
-                        <td>@item.Name</td>
-                        <td>@item.Category?.Name</td>
-                        <td class="text-end">@item.Price.ToString("N2")</td>
-                        <td class="text-center">
-                            <span class="badge @(item.Stock > 10 ? "bg-success" : "bg-danger")">
-                                @item.Stock
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <div class="form-check form-switch d-flex justify-content-center">
-                                <input class="form-check-input" type="checkbox" 
-                                    onchange="toggleStatus(@item.Id, this)"
-                                    @(item.Status ? "checked" : "")>
-                            </div>
-                        </td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-info" onclick="showEditModal(@item.Id)">
-                                ✏️ แก้ไข
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(@item.Id)">
-                                🗑️ ลบ
-                            </button>
-                        </td>
+                        <th>หมวดหมู่</th>
+                        <th>บาร์โค้ด</th>
+                        <th>ชื่อสินค้า</th>
+                        <th class="text-end">ราคา</th>
+                        <th class="text-center">คงเหลือ</th>
+                        <th class="text-center">สถานะ</th>
+                        <th>รูปภาพ</th>
+                        <th class="text-end">จัดการ</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td data-category-id="@item.CategoryId">@item.Category?.Name</td>
+                            <td>@item.Barcode</td>
+                            <td>@item.Name</td>
+                            <td class="text-end">@item.Price.ToString("N2")</td>
+                            <td class="text-center">
+                                <span class="badge @(item.Stock > 10 ? "bg-success" : "bg-danger")">
+                                    @item.Stock
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-check form-switch d-flex justify-content-center">
+                                    <input class="form-check-input" type="checkbox" 
+                                        onchange="toggleStatus(@item.Id, this)"
+                                        @(item.Status ? "checked" : "")>
+                                </div>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImageBase64))
+                                {
+                                    <img src="data:@item.ImageType;base64,@item.ImageBase64" 
+                                        alt="@item.Name" class="product-image" />
+                                }
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-info" onclick="showEditModal(@item.Id)">
+                                    ✏️ แก้ไข
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(@item.Id)">
+                                    🗑️ ลบ
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 </div>
 
 <!-- Modal จัดการหมวดหมู่ -->
@@ -754,6 +787,8 @@
                 const formData = new FormData();
                 const id = document.getElementById('productId').value;
                 
+                // เพิ่ม Id เข้าไปใน formData
+                formData.append('Id', id);  // เพิ่มบรรทัดนี้
                 formData.append('Name', document.getElementById('name').value.trim());
                 formData.append('Barcode', document.getElementById('barcode').value.trim());
                 formData.append('CategoryId', document.getElementById('categoryId').value);
@@ -765,7 +800,8 @@
                     formData.append('imageFile', imageFile);
                 }
 
-                const url = id ? `/Product/Update?id=${id}` : '/Product/Create';
+                // แก้ไข URL
+                const url = id ? '/Product/Update' : '/Product/Create';
                 
                 const response = await fetch(url, {
                     method: 'POST',
@@ -784,8 +820,7 @@
                 console.error('Error:', error);
                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
             }
-        }
-        
+        }        
         async function showEditModal(id) {
             try {
                 // แก้ URL ให้ตรงกับ Route
@@ -862,23 +897,108 @@
                 alert('เกิดข้อผิดพลาดในการลบสินค้า');
             }
         }
+
         function filterProducts() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const categoryId = document.getElementById('categoryFilter').value;
-
             const rows = document.querySelectorAll('tbody tr');
 
             rows.forEach(row => {
-                const name = row.cells[2].textContent.toLowerCase();
-                const category = row.cells[3].textContent;
-                const categoryMatch = !categoryId || row.cells[3].dataset.categoryId === categoryId;
+                // แก้ไขตำแหน่งคอลัมน์ให้ตรงกับ HTML
+                const categoryCell = row.cells[0];  // ชื่อหมวดอยู่คอลัมน์แรก
+                const barcode = row.cells[1].textContent.toLowerCase();  // บาร์โค้ดอยู่คอลัมน์ที่ 2
+                const name = row.cells[2].textContent.toLowerCase();    // ชื่อสินค้าอยู่คอลัมน์ที่ 3
 
-                if (name.includes(search) && categoryMatch) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                // ตรวจสอบการกรองตามหมวดหมู่
+                const categoryMatch = !categoryId || categoryCell.getAttribute('data-category-id') === categoryId;
+
+                // ค้นหาทั้งชื่อและบาร์โค้ด
+                const searchMatch = name.includes(search) || barcode.includes(search);
+
+                // แสดง/ซ่อนแถว
+                row.style.display = (searchMatch && categoryMatch) ? '' : 'none';
+
+                // Debug
+                console.log('Row:', {
+                    categoryId: categoryCell.getAttribute('data-category-id'),
+                    selectedCategory: categoryId,
+                    categoryMatch,
+                    searchMatch,
+                    visible: row.style.display === ''
+                });
             });
+
+            // แสดงจำนวนรายการที่พบ
+            const visibleRows = document.querySelectorAll('tbody tr:not([style*="display: none"])').length;
+            const totalRows = rows.length;
+            
+            // อัพเดตข้อความแสดงจำนวนรายการ
+            const resultCount = document.getElementById('resultCount');
+            if (resultCount) {
+                resultCount.textContent = `แสดง ${visibleRows} จาก ${totalRows} รายการ`;
+            }
+        }        
+        
+        // เพิ่ม Event Listener
+        document.addEventListener('DOMContentLoaded', function() {
+            // เพิ่ม event listener สำหรับ input ค้นหา
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', filterProducts);
+            }
+
+            // เพิ่ม event listener สำหรับ dropdown หมวดหมู่
+            const categoryFilter = document.getElementById('categoryFilter');
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', filterProducts);
+            }
+
+            // เรียกฟังก์ชันครั้งแรกเพื่อแสดงจำนวนรายการ
+            filterProducts();
+        });
+
+        async function exportTemplate() {
+    window.location.href = '/Product/ExportTemplate';
+}
+
+        async function importExcel(input) {
+            if (!input.files || input.files.length === 0) {
+                alert('กรุณาเลือกไฟล์');
+                return;
+            }
+
+            const file = input.files[0];
+            if (!file.name.endsWith('.xlsx')) {
+                alert('กรุณาเลือกไฟล์ Excel (.xlsx) เท่านั้น');
+                input.value = '';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/Product/ImportExcel', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการนำเข้าข้อมูล');
+            }
+
+            // เคลียร์ไฟล์ที่เลือก
+            input.value = '';
         }
+
     </script>
 }
