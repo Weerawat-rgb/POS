@@ -18,12 +18,50 @@ namespace POS.Web.Controllers
         {
             var products = await _context.Products
                 .Include(p => p.Category)
-                .OrderBy(p => p.Category != null ? p.Category.Name : "")  // จัดการกรณี Category เป็น null
+                .OrderBy(p => p.Category != null ? p.Category.Name : string.Empty)  // จัดการกรณี Category เป็น null
                 .ThenBy(p => p.Name)
                 .ToListAsync();
 
-            ViewBag.Categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories
+                .Include(c => c.Products)
+                .Where(c => c.IsActive)  // เพิ่มเงื่อนไขดึงเฉพาะ active categories
+                .OrderBy(c => c.Name)
+                .Select(c => new  // เพิ่ม Select เพื่อรวมข้อมูลจำนวนสินค้า
+                {
+                    Category = c,
+                    ProductCount = c.Products.Count
+                })
+                .ToListAsync();
+
+            ViewBag.Categories = categories.Select(x => x.Category).ToList();
+            ViewBag.ProductCounts = categories.ToDictionary(x => x.Category.Id, x => x.ProductCount);
+
             return View(products);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategories(bool showDeleted = false)
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Include(c => c.Products)
+                    .Where(c => c.IsActive != showDeleted)
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        name = c.Name,
+                        productCount = c.Products.Count
+                    })
+                    .OrderBy(c => c.name)
+                    .ToListAsync();
+
+                return Json(categories);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
 
         [HttpGet]
@@ -49,23 +87,31 @@ namespace POS.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Product product)
+        public async Task<IActionResult> Create([FromForm] Product product, IFormFile? imageFile)
         {
             try
             {
-                // ตรวจสอบว่ามี Category หรือไม่
-                if (product.CategoryId > 0)
+                if (imageFile != null)
                 {
-                    var category = await _context.Categories.FindAsync(product.CategoryId);
-                    if (category == null)
+                    // บันทึกรูปภาพ
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                    var imagePath = Path.Combine("wwwroot", "images", "products", fileName);
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(imagePath)!);
+
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
                     {
-                        return Json(new { success = false, message = "ไม่พบหมวดหมู่ที่ระบุ" });
+                        await imageFile.CopyToAsync(stream);
                     }
+
+                    product.Image = $"/images/products/{fileName}";
                 }
 
+                product.IsActive = true;
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, product });
+
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -78,23 +124,46 @@ namespace POS.Web.Controllers
         {
             try
             {
-                // ตรวจสอบว่ามี Category หรือไม่
-                if (product.CategoryId > 0)
+                // ตรวจสอบข้อมูล
+                if (string.IsNullOrEmpty(product.Name))
                 {
-                    var category = await _context.Categories.FindAsync(product.CategoryId);
-                    if (category == null)
-                    {
-                        return Json(new { success = false, message = "ไม่พบหมวดหมู่ที่ระบุ" });
-                    }
+                    return Json(new { success = false, message = "กรุณาระบุชื่อสินค้า" });
                 }
 
+                if (string.IsNullOrEmpty(product.Barcode))
+                {
+                    return Json(new { success = false, message = "กรุณาระบุบาร์โค้ด" });
+                }
+
+                // ตรวจสอบบาร์โค้ดซ้ำ (ยกเว้นรายการปัจจุบัน)
+                var existingBarcode = await _context.Products
+                    .AnyAsync(p => p.Barcode == product.Barcode && p.Id != product.Id);
+
+                if (existingBarcode)
+                {
+                    return Json(new { success = false, message = "บาร์โค้ดนี้มีในระบบแล้ว" });
+                }
+
+                // ตรวจสอบหมวดหมู่
+                if (product.CategoryId == 0)
+                {
+                    return Json(new { success = false, message = "กรุณาเลือกหมวดหมู่" });
+                }
+
+                var category = await _context.Categories.FindAsync(product.CategoryId);
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "ไม่พบหมวดหมู่ที่เลือก" });
+                }
+
+                // ดึงข้อมูลเดิม
                 var existingProduct = await _context.Products.FindAsync(product.Id);
                 if (existingProduct == null)
                 {
-                    return NotFound();
+                    return Json(new { success = false, message = "ไม่พบสินค้าที่ต้องการแก้ไข" });
                 }
 
-                // อัพเดทข้อมูล
+                // อัพเดตข้อมูล
                 existingProduct.Name = product.Name;
                 existingProduct.Barcode = product.Barcode;
                 existingProduct.Price = product.Price;
@@ -102,11 +171,12 @@ namespace POS.Web.Controllers
                 existingProduct.CategoryId = product.CategoryId;
 
                 await _context.SaveChangesAsync();
+
                 return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = "เกิดข้อผิดพลาด: " + ex.Message });
             }
         }
 
@@ -129,7 +199,7 @@ namespace POS.Web.Controllers
             }
         }
 
-        // สำหรับเพิ่มหมวดหมู่
+        // Add Categories
 
         [HttpPost]
         public async Task<IActionResult> AddCategory([FromBody] Category category)
@@ -153,6 +223,7 @@ namespace POS.Web.Controllers
                 _context.Categories.Add(category);
                 await _context.SaveChangesAsync();
 
+                // ส่งข้อมูลที่จำเป็นกลับไป
                 return Json(new
                 {
                     success = true,
@@ -169,6 +240,7 @@ namespace POS.Web.Controllers
             }
         }
 
+        // Update Categories
         [HttpPost]
         public async Task<IActionResult> UpdateCategory([FromBody] Category category)
         {
@@ -206,8 +278,9 @@ namespace POS.Web.Controllers
             }
         }
 
+        // Delete Categories
         [HttpPost]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCategory(int id)  // ลบ [FromBody] ออก
         {
             try
             {
@@ -230,7 +303,8 @@ namespace POS.Web.Controllers
                     });
                 }
 
-                _context.Categories.Remove(category);
+                // Soft delete
+                category.IsActive = false;
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true });
@@ -240,5 +314,95 @@ namespace POS.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+        // เพิ่มเมธอดสำหรับกู้คืนหมวดหมู่
+        [HttpPost]
+        public async Task<IActionResult> RestoreCategory([FromBody] int id)
+        {
+            try
+            {
+                var category = await _context.Categories.FindAsync(id);
+                if (category == null)
+                {
+                    return Json(new { success = false, message = "ไม่พบหมวดหมู่" });
+                }
+
+                // ตรวจสอบว่ามีชื่อซ้ำกับหมวดหมู่ที่ active อยู่หรือไม่
+                var duplicateName = await _context.Categories
+                    .AnyAsync(c => c.IsActive && c.Name == category.Name);
+
+                if (duplicateName)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "มีหมวดหมู่ที่ใช้งานอยู่ใช้ชื่อนี้แล้ว"
+                    });
+                }
+
+                category.IsActive = true;
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetActiveCategories()
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Where(c => c.IsActive)
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        name = c.Name
+                    })
+                    .OrderBy(c => c.name)
+                    .ToListAsync();
+
+                return Json(categories);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("GetProduct/{id}")]
+        public async Task<IActionResult> GetProduct(int id)
+        {
+            try
+            {
+                var product = await _context.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                return Json(new
+                {
+                    id = product.Id,
+                    name = product.Name,
+                    barcode = product.Barcode,
+                    price = product.Price,
+                    stock = product.Stock,
+                    categoryId = product.CategoryId,
+                    categoryName = product.Category?.Name
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
     }
 }

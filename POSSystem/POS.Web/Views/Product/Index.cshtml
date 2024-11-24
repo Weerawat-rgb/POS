@@ -1,4 +1,5 @@
 @model IEnumerable<POS.Web.Models.Entities.Product>
+@using POS.Web.Models.Entities
 
 @{
     ViewData["Title"] = "จัดการสินค้า";
@@ -19,70 +20,65 @@
     </div>
 
     <!-- การ์ดแสดงข้อมูล -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <input type="text" class="form-control" id="searchInput" placeholder="🔍 ค้นหาสินค้า..."
-                        oninput="filterProducts()">
-                </div>
-                <div class="col-md-4">
-                    <select class="form-select" id="categoryFilter" onchange="filterProducts()">
-                        <option value="">ทุกหมวดหมู่</option>
-                        @foreach (var category in ViewBag.Categories)
-                        {
-                            <option value="@category.Id">@category.Name</option>
-                        }
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>รหัสสินค้า</th>
-                            <th>บาร์โค้ด</th>
-                            <th>ชื่อสินค้า</th>
-                            <th>หมวดหมู่</th>
-                            <th class="text-end">ราคา</th>
-                            <th class="text-center">คงเหลือ</th>
-                            <th class="text-center">การจัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <td>@item.Id</td>
-                                <td>@item.Barcode</td>
-                                <td>@item.Name</td>
-                                <td>@item.Category?.Name</td>
-                                <td class="text-end">@item.Price.ToString("N2")</td>
-                                <td class="text-center">
-                                    <span class="badge @(item.Stock > 10 ? "bg-success" : "bg-danger")">
-                                        @item.Stock
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-warning" onclick="showEditModal(@item.Id)">
-                                        ✏️ แก้ไข
-                                    </button>
-                                    <button class="btn btn-sm btn-danger" onclick="confirmDelete(@item.Id)">
-                                        🗑️ ลบ
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>รูปภาพ</th>
+                    <th>หมวดหมู่</th>
+                    <th>บาร์โค้ด</th>
+                    <th>ชื่อสินค้า</th>
+                    <th class="text-end">ราคา</th>
+                    <th class="text-center">คงเหลือ</th>
+                    <th class="text-center">สถานะ</th>
+                    <th class="text-end">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.Image))
+                            {
+                                <img src="@item.Image" alt="@item.Name" class="product-image" />
+                            }
+                            else
+                            {
+                                <img src="/images/no-image.png" alt="No Image" class="product-image" />
+                            }
+                        </td>
+                        <td>@item.Category?.Name</td>
+                        <td>@item.Barcode</td>
+                        <td>@item.Name</td>
+                        <td class="text-end">@item.Price.ToString("N2")</td>
+                        <td class="text-center">
+                            <span class="badge @(item.Stock > 10 ? "bg-success" : "bg-danger")">
+                                @item.Stock
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge @(item.IsActive ? "bg-success" : "bg-danger")">
+                                @(item.IsActive ? "เปิดใช้งาน" : "ปิดใช้งาน")
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-warning" onclick="showEditModal(@item.Id)">
+                                ✏️ แก้ไข
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(@item.Id)">
+                                🗑️ ลบ
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
+</div>
 
-<!-- เพิ่ม Modal สำหรับจัดการหมวดหมู่ -->
+<!-- Modal จัดการหมวดหมู่ -->
 <div class="modal fade" id="categoryModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -101,26 +97,39 @@
                     </div>
                 </form>
 
-                <!-- รายการหมวดหมู่ -->
+                <!-- Switch สลับการแสดงผล -->
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="showDeletedSwitch"
+                            onchange="toggleCategoryView()">
+                        <label class="form-check-label" for="showDeletedSwitch">
+                            แสดงรายการที่ถูกลบ
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ตารางแสดงรายการหมวดหมู่ -->
                 <div class="table-responsive">
                     <table class="table table-hover" id="categoryTable">
                         <thead class="table-light">
                             <tr>
                                 <th>ชื่อหมวดหมู่</th>
-                                <th>จำนวนสินค้า</th>
+                                <th class="text-center">จำนวนรายการ</th>
                                 <th class="text-end">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var category in ViewBag.Categories)
+                            @foreach (var category in (List<Category>)ViewBag.Categories)
                             {
-                                <tr>
+                                var productCount = ((Dictionary<int, int>)ViewBag.ProductCounts)[category.Id];
+
+                                <tr data-category-id="@category.Id" data-active="true">
                                     <td>
                                         <span class="category-name">@category.Name</span>
                                         <input type="text" class="form-control category-edit d-none" value="@category.Name">
                                     </td>
-                                    <td>
-                                        @Model.Count(p => p.CategoryId == category.Id) รายการ
+                                    <td class="text-center">
+                                        @productCount รายการ
                                     </td>
                                     <td class="text-end">
                                         <button class="btn btn-sm btn-warning edit-btn"
@@ -145,7 +154,7 @@
     </div>
 </div>
 
-<!-- Modal เพิ่ม/แก้ไขสินค้า -->
+<!-- Modal Products -->
 <div class="modal fade" id="productModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -155,31 +164,51 @@
             </div>
             <div class="modal-body">
                 <form id="productForm">
-                    <input type="hidden" id="productId">
+                    <input type="hidden" id="productId" />
+                    <input type="hidden" id="currentImage" />
+
                     <div class="mb-3">
-                        <label class="form-label">บาร์โค้ด</label>
-                        <input type="text" class="form-control" id="barcode" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">ชื่อสินค้า</label>
-                        <input type="text" class="form-control" id="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">หมวดหมู่</label>
+                        <label for="categoryId" class="form-label">หมวดหมู่</label>
                         <select class="form-select" id="categoryId" required>
-                            @foreach (var category in ViewBag.Categories)
-                            {
-                                <option value="@category.Id">@category.Name</option>
-                            }
+                            <option value="">เลือกหมวดหมู่...</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">ราคา</label>
+                        <label for="barcode" class="form-label">บาร์โค้ด</label>
+                        <input type="text" class="form-control" id="barcode" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">ชื่อสินค้า</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label">ราคา</label>
                         <input type="number" class="form-control" id="price" min="0" step="0.01" required>
                     </div>
+
                     <div class="mb-3">
-                        <label class="form-label">จำนวนคงเหลือ</label>
+                        <label for="stock" class="form-label">จำนวน</label>
                         <input type="number" class="form-control" id="stock" min="0" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">รูปภาพ</label>
+                        <input type="file" class="form-control" id="image" accept="image/*">
+                        <div id="imagePreview" class="mt-2">
+                            <!-- รูปภาพจะถูกแสดงที่นี่ -->
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isActive" checked>
+                            <label class="form-check-label" for="isActive">
+                                เปิดใช้งาน
+                            </label>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -193,18 +222,73 @@
 
 @section Scripts {
 
-    @* เพิ่มหมวดหมู่ *@
+    @* // script Categories *@
     <script>
         let categoryModal;
+        let isShowingDeleted = false;
 
         document.addEventListener('DOMContentLoaded', function () {
             categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
         });
 
-        function showCategoryModal() {
-            categoryModal.show();
+        function toggleCategoryView() {
+            const showDeleted = document.getElementById('showDeletedSwitch').checked;
+            loadCategories(showDeleted);
         }
 
+        // เพิ่มฟังก์ชันสำหรับการแสดง Modal
+        function showCategoryModal() {
+            const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            modal.show();
+        }
+
+        async function loadCategories(showDeleted = false) {
+            try {
+                const response = await fetch(`/Product/GetCategories?showDeleted=${showDeleted}`);
+                const data = await response.json();
+
+                const tbody = document.querySelector('#categoryTable tbody');
+                tbody.innerHTML = ''; // เคลียร์ข้อมูลเดิม
+
+                data.forEach(category => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.categoryId = category.id;
+                    tr.dataset.active = !showDeleted;
+
+                    tr.innerHTML = `
+                                                            <td>
+                                                                <span class="category-name">${category.name}</span>
+                                                                <input type="text" class="form-control category-edit d-none" value="${category.name}">
+                                                            </td>
+                                                            <td class="text-center">
+                                                                ${category.productCount} รายการ
+                                                            </td>
+                                                            <td class="text-end">
+                                                                ${!showDeleted ? `
+                                                                    <button class="btn btn-sm btn-warning edit-btn" onclick="startEditCategory(this, ${category.id})">
+                                                                        ✏️ แก้ไข
+                                                                    </button>
+                                                                    <button class="btn btn-sm btn-success save-btn d-none" onclick="saveCategory(this, ${category.id})">
+                                                                        💾 บันทึก
+                                                                    </button>
+                                                                    <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.id})">
+                                                                        🗑️ ลบ
+                                                                    </button>
+                                                                ` : `
+                                                                    <button class="btn btn-sm btn-primary" onclick="restoreCategory(${category.id})">
+                                                                        ♻️ กู้คืน
+                                                                    </button>
+                                                                `}
+                                                            </td>
+                                                        `;
+
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่');
+            }
+        }
         async function addCategory() {
             const name = document.getElementById('newCategoryName').value;
             if (!name) {
@@ -233,119 +317,13 @@
             }
         }
 
-        function startEditCategory(btn, id) {
+        async function startEditCategory(btn, id) {
             const row = btn.closest('tr');
             row.querySelector('.category-name').classList.add('d-none');
             row.querySelector('.category-edit').classList.remove('d-none');
             row.querySelector('.edit-btn').classList.add('d-none');
             row.querySelector('.save-btn').classList.remove('d-none');
         }
-
-        async function saveCategory(btn, id) {
-            const row = btn.closest('tr');
-            const newName = row.querySelector('.category-edit').value;
-
-            try {
-                const response = await fetch('/Product/UpdateCategory', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id, name: newName })
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    location.reload();
-                } else {
-                    alert('เกิดข้อผิดพลาด: ' + result.message);
-                }
-            } catch (error) {
-                alert('เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่');
-            }
-        }
-
-        async function deleteCategory(id) {
-            if (!confirm('ยืนยันการลบหมวดหมู่?')) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/Product/DeleteCategory?id=${id}`, {
-                    method: 'POST'
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    location.reload();
-                } else {
-                    alert('เกิดข้อผิดพลาด: ' + result.message);
-                }
-            } catch (error) {
-                alert('เกิดข้อผิดพลาดในการลบหมวดหมู่');
-            }
-        }
-    </script>
-
-    @*เพิ่มหมวดหมู่/ สินค้า  *@
-    <script>
-        let productModal;
-
-        document.addEventListener('DOMContentLoaded', function () {
-            productModal = new bootstrap.Modal(document.getElementById('productModal'));
-        });
-
-        function showAddModal() {
-            document.getElementById('modalTitle').textContent = 'เพิ่มสินค้า';
-            document.getElementById('productForm').reset();
-            document.getElementById('productId').value = '';
-            productModal.show();
-        }
-
-        function showEditModal(id) {
-            document.getElementById('modalTitle').textContent = 'แก้ไขสินค้า';
-            // TODO: ดึงข้อมูลสินค้าจาก API
-            productModal.show();
-        }
-
-        @* เพิ่มหมวดหมู่ *@
-            async function addCategory() {
-                const nameInput = document.getElementById('newCategoryName');
-                const name = nameInput.value.trim();
-
-                if (!name) {
-                    alert('กรุณากรอกชื่อหมวดหมู่');
-                    nameInput.focus();
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/Product/AddCategory', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ name })
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        // เคลียร์ค่าใน input
-                        nameInput.value = '';
-                        // รีโหลดหน้าเพื่อแสดงข้อมูลใหม่
-                        location.reload();
-                    } else {
-                        alert('เกิดข้อผิดพลาด: ' + result.message);
-                        nameInput.focus();
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่');
-                }
-            }
 
         async function saveCategory(btn, id) {
             const row = btn.closest('tr');
@@ -370,25 +348,393 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    location.reload();
+                    // อัพเดตชื่อที่แสดงในตาราง
+                    const nameSpan = row.querySelector('.category-name');
+                    nameSpan.textContent = name;
+
+                    // ซ่อนฟอร์มแก้ไข แสดงชื่อ
+                    nameSpan.classList.remove('d-none');
+                    input.classList.add('d-none');
+
+                    // สลับปุ่ม
+                    row.querySelector('.edit-btn').classList.remove('d-none');
+                    row.querySelector('.save-btn').classList.add('d-none');
+
+                    // อัพเดต dropdown ในฟอร์มสินค้า (ถ้ามี)
+                    const categorySelect = document.getElementById('categoryId');
+                    if (categorySelect) {
+                        const option = categorySelect.querySelector(`option[value="${id}"]`);
+                        if (option) {
+                            option.textContent = name;
+                        }
+                    }
+
+                    // อัพเดต dropdown filter (ถ้ามี)
+                    const filterSelect = document.getElementById('categoryFilter');
+                    if (filterSelect) {
+                        const filterOption = filterSelect.querySelector(`option[value="${id}"]`);
+                        if (filterOption) {
+                            filterOption.textContent = name;
+                        }
+                    }
+
+                    // แสดงข้อความสำเร็จ
+                    const toast = document.createElement('div');
+                    toast.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3';
+                    toast.innerHTML = `
+                                                                    บันทึกการแก้ไขเรียบร้อย
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                `;
+                    document.body.appendChild(toast);
+
+                    // ลบ toast หลังจาก 3 วินาที
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+
                 } else {
                     alert('เกิดข้อผิดพลาด: ' + result.message);
                     input.focus();
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('เกิดข้อผิดพลาดในการแก้ไขหมวดหมู่');
+                alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                input.focus();
             }
         }
 
         async function deleteCategory(id) {
-            if (!confirm('ยืนยันการลบหมวดหมู่?')) {
+            if (!confirm('ต้องการลบหมวดหมู่นี้?')) {
                 return;
             }
 
             try {
-                const response = await fetch(`/Product/DeleteCategory?id=${id}`, {
+                const response = await fetch('/Product/DeleteCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(id)  // ส่ง id เป็น JSON
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // อัพเดตการแสดงผลในตาราง
+                    const row = document.querySelector(`tr[data-category-id="${id}"]`);
+                    if (row) {
+                        // ซ่อนแถวที่ถูกลบ
+                        row.style.display = 'none';
+                        // หรือลบแถวออกไปเลย
+                        // row.remove();
+                    }
+                    // แสดงข้อความสำเร็จ
+                    alert('ลบหมวดหมู่เรียบร้อยแล้ว');
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการลบหมวดหมู่');
+            }
+        }
+        async function showDeletedCategories() {
+            try {
+                const response = await fetch('/Product/DeletedCategories');
+                const content = await response.text();
+
+                // แสดงหน้าต่าง Modal ใหม่สำหรับแสดงหมวดหมู่ที่ถูกลบ
+                const modal = new bootstrap.Modal(document.createElement('div'));
+                modal.element.innerHTML = content;
+                modal.show();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการโหลดหมวดหมู่ที่ถูกลบ');
+            }
+        }
+
+        async function restoreCategory(id) {
+            if (!confirm('ต้องการกู้คืนหมวดหมู่นี้?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/Product/RestoreCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(id)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // โหลดข้อมูลใหม่
+                    const showDeleted = document.getElementById('showDeletedSwitch').checked;
+                    loadCategories(showDeleted);
+                    alert('กู้คืนหมวดหมู่เรียบร้อยแล้ว');
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการกู้คืนหมวดหมู่');
+            }
+        }
+    </script>
+
+    @* //script product *@
+    <script>
+        let productModal;
+        let categorySelect; // เพิ่มตัวแปรสำหรับเก็บ reference ของ select
+
+        document.addEventListener('DOMContentLoaded', function () {
+            productModal = new bootstrap.Modal(document.getElementById('productModal'));
+            categorySelect = document.getElementById('categoryId'); // select สำหรับหมวดหมู่ในฟอร์มสินค้า
+            loadCategoriesForProduct(); // โหลดหมวดหมู่ครั้งแรก
+        });
+
+        document.getElementById('image').addEventListener('change', function (e) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('img-fluid');
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        async function loadCategoriesForProduct() {
+            try {
+                const response = await fetch('/Product/GetActiveCategories'); // เพิ่ม endpoint ใหม่
+                const categories = await response.json();
+
+                // อัพเดต dropdown ในฟอร์มสินค้า
+                if (categorySelect) {
+                    categorySelect.innerHTML = ''; // เคลียร์ตัวเลือกเดิม
+
+                    // เพิ่มตัวเลือกเริ่มต้น
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = '-- เลือกหมวดหมู่ --';
+                    categorySelect.appendChild(defaultOption);
+
+                    // เพิ่มรายการหมวดหมู่
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.id;
+                        option.textContent = category.name;
+                        categorySelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                alert('เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่');
+            }
+        }
+
+        function showAddModal() {
+            loadCategoriesForProduct(); // โหลดหมวดหมู่ใหม่ก่อนแสดง modal
+            document.getElementById('modalTitle').textContent = 'เพิ่มสินค้า';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            productModal.show();
+        }
+
+        function showAddModal() {
+            loadCategoriesForProduct(); // โหลดหมวดหมู่ใหม่ก่อนแสดง modal
+            document.getElementById('modalTitle').textContent = 'เพิ่มสินค้า';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            productModal.show();
+        }
+
+        // AddCategory
+        async function addCategory() {
+            const nameInput = document.getElementById('newCategoryName');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert('กรุณากรอกชื่อหมวดหมู่');
+                nameInput.focus();
+                return;
+            }
+
+            try {
+                const response = await fetch('/Product/AddCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // เคลียร์ค่าใน input
+                    nameInput.value = '';
+                    nameInput.focus();
+
+                    // อัพเดตตารางหมวดหมู่โดยไม่ต้องรีโหลดหน้า
+                    const tbody = document.querySelector('#categoryTable tbody');
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                                                                                                                                    <td>
+                                                                                                                                        <span class="category-name">${result.category.name}</span>
+                                                                                                                                        <input type="text" class="form-control category-edit d-none" value="${result.category.name}">
+                                                                                                                                    </td>
+                                                                                                                                    <td>0 รายการ</td>
+                                                                                                                                    <td class="text-end">
+                                                                                                                                        <button class="btn btn-sm btn-warning edit-btn" onclick="startEditCategory(this, ${result.category.id})">
+                                                                                                                                            ✏️ แก้ไข
+                                                                                                                                        </button>
+                                                                                                                                        <button class="btn btn-sm btn-success save-btn d-none" onclick="saveCategory(this, ${result.category.id})">
+                                                                                                                                            💾 บันทึก
+                                                                                                                                        </button>
+                                                                                                                                        <button class="btn btn-sm btn-danger" onclick="deleteCategory(${result.category.id})">
+                                                                                                                                            🗑️ ลบ
+                                                                                                                                        </button>
+                                                                                                                                    </td>
+                                                                                                                                        `;
+                    tbody.appendChild(newRow);
+
+                    // อัพเดต dropdown ในฟอร์มสินค้า
+                    const categorySelect = document.getElementById('categoryId');
+                    const option = document.createElement('option');
+                    option.value = result.category.id;
+                    option.textContent = result.category.name;
+                    categorySelect.appendChild(option);
+
+                    // อัพเดต dropdown filter
+                    const filterSelect = document.getElementById('categoryFilter');
+                    const filterOption = document.createElement('option');
+                    filterOption.value = result.category.id;
+                    filterOption.textContent = result.category.name;
+                    filterSelect.appendChild(filterOption);
+
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                    nameInput.focus();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการเพิ่มหมวดหมู่');
+            }
+        }
+        async function saveCategory(btn, id) {
+            const row = btn.closest('tr');
+            const input = row.querySelector('.category-edit');
+            const name = input.value.trim();
+
+            if (!name) {
+                alert('กรุณากรอกชื่อหมวดหมู่');
+                input.focus();
+                return;
+            }
+
+            try {
+                const response = await fetch('/Product/UpdateCategory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id, name })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // โหลดข้อมูลใหม่
+                    const showDeleted = document.getElementById('showDeletedSwitch').checked;
+                    loadCategories(showDeleted);
+
+                    // แสดงข้อความแจ้งเตือน
+                    alert('บันทึกการแก้ไขเรียบร้อย');
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                    input.focus();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                input.focus();
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('ต้องการลบหมวดหมู่นี้?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Product/DeleteCategory?id=${id}`, {  // แก้ไขการส่ง id
                     method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // อัพเดตการแสดงผลในตาราง
+                    const row = document.querySelector(`tr[data-category-id="${id}"]`);
+                    if (row) {
+                        row.style.display = 'none';
+                    }
+                    alert('ลบหมวดหมู่เรียบร้อยแล้ว');
+
+                    // โหลดข้อมูลใหม่
+                    const showDeleted = document.getElementById('showDeletedSwitch').checked;
+                    loadCategories(showDeleted);
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการลบหมวดหมู่');
+            }
+        }
+        // เพิ่มการตรวจสอบการกด Enter ที่ช่องเพิ่มหมวดหมู่
+        document.getElementById('newCategoryName').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addCategory();
+            }
+        });
+
+        // AddProduct
+        async function saveProduct() {
+            const form = document.getElementById('productForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('id', document.getElementById('productId').value || '0');
+            formData.append('categoryId', document.getElementById('categoryId').value);
+            formData.append('barcode', document.getElementById('barcode').value);
+            formData.append('name', document.getElementById('name').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('stock', document.getElementById('stock').value);
+            formData.append('isActive', document.getElementById('isActive').checked);
+
+            const imageFile = document.getElementById('image').files[0];
+            if (imageFile) {
+                formData.append('imageFile', imageFile);
+            }
+
+            try {
+                const url = document.getElementById('productId').value ? '/Product/Update' : '/Product/Create';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
                 });
 
                 const result = await response.json();
@@ -400,53 +746,37 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('เกิดข้อผิดพลาดในการลบหมวดหมู่');
+                alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
             }
         }
 
-        // เพิ่มการตรวจสอบการกด Enter ที่ช่องเพิ่มหมวดหมู่
-        document.getElementById('newCategoryName').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addCategory();
+        async function showEditModal(id) {
+            try {
+                // โหลด Categories ก่อน
+                await loadCategoriesForProduct();
+
+                // ดึงข้อมูลสินค้า
+                const response = await fetch(`/Product/GetProduct/${id}`);
+                if (!response.ok) throw new Error('Failed to load product');
+
+                const product = await response.json();
+
+                // กำหนดค่าให้ form
+                document.getElementById('modalTitle').textContent = 'แก้ไขสินค้า';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('categoryId').value = product.categoryId;
+                document.getElementById('barcode').value = product.barcode;
+                document.getElementById('name').value = product.name;
+                document.getElementById('price').value = product.price;
+                document.getElementById('stock').value = product.stock;
+
+                productModal.show();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการโหลดข้อมูลสินค้า');
             }
-        });
+        }
 
-
-        @* เพิ่มสินค้า *@
-            async function saveProduct() {
-                const product = {
-                    id: document.getElementById('productId').value || 0,
-                    barcode: document.getElementById('barcode').value,
-                    name: document.getElementById('name').value,
-                    categoryId: document.getElementById('categoryId').value,
-                    price: document.getElementById('price').value,
-                    stock: document.getElementById('stock').value
-                };
-
-                const url = product.id ? '/Product/Update' : '/Product/Create';
-
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(product)
-                    });
-
-                    const result = await response.json();
-
-                    if (result.success) {
-                        productModal.hide();
-                        location.reload();
-                    } else {
-                        alert('เกิดข้อผิดพลาด: ' + result.message);
-                    }
-                } catch (error) {
-                    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-                }
-            }
 
         function confirmDelete(id) {
             if (confirm('ยืนยันการลบสินค้า?')) {

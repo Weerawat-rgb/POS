@@ -137,3 +137,4 @@ D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net8.0\refint\POS.Web.dll
 D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net8.0\POS.Web.pdb
 D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net8.0\POS.Web.genruntimeconfig.cache
 D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net8.0\ref\POS.Web.dll
+D:\myApp\POS\POSSystem\POS.Web\obj\Debug\net8.0\POS.Web.sourcelink.json
