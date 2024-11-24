@@ -18,6 +18,7 @@ namespace POS.Web.Controllers
         {
             var products = await _context.Products
                 .Include(p => p.Category)
+                .Where(p => p.IsActive)  // ดึงเฉพาะรายการที่ยังไม่ถูกลบ
                 .OrderBy(p => p.Category != null ? p.Category.Name : string.Empty)  // จัดการกรณี Category เป็น null
                 .ThenBy(p => p.Name)
                 .ToListAsync();
@@ -87,80 +88,93 @@ namespace POS.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] Product product, IFormFile? imageFile)
-        {
-            try
-            {
-                if (imageFile != null)
-                {
-                    // บันทึกรูปภาพ
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
-                    var imagePath = Path.Combine("wwwroot", "images", "products", fileName);
-
-                    Directory.CreateDirectory(Path.GetDirectoryName(imagePath)!);
-
-                    using (var stream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    product.Image = $"/images/products/{fileName}";
-                }
-
-                product.IsActive = true;
-                _context.Products.Add(product);
-                await _context.SaveChangesAsync();
-
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
 
         [HttpPost]
-        public async Task<IActionResult> Update([FromBody] Product product)
+        public async Task<IActionResult> Create([FromForm] Product model, IFormFile? imageFile)
         {
             try
             {
                 // ตรวจสอบข้อมูล
-                if (string.IsNullOrEmpty(product.Name))
-                {
+                if (string.IsNullOrEmpty(model.Name))
                     return Json(new { success = false, message = "กรุณาระบุชื่อสินค้า" });
-                }
 
-                if (string.IsNullOrEmpty(product.Barcode))
-                {
+                if (string.IsNullOrEmpty(model.Barcode))
                     return Json(new { success = false, message = "กรุณาระบุบาร์โค้ด" });
+
+                if (model.CategoryId <= 0)
+                    return Json(new { success = false, message = "กรุณาเลือกหมวดหมู่" });
+
+                // ตรวจสอบบาร์โค้ดซ้ำ
+                var existingBarcode = await _context.Products
+                    .AnyAsync(p => p.Barcode == model.Barcode && p.IsActive);
+
+                if (existingBarcode)
+                    return Json(new { success = false, message = "บาร์โค้ดนี้มีในระบบแล้ว" });
+
+                var product = new Product
+                {
+                    Name = model.Name,
+                    Barcode = model.Barcode,
+                    Price = model.Price,
+                    Stock = model.Stock,
+                    CategoryId = model.CategoryId,
+                    Status = true,
+                    IsActive = true
+                };
+
+                // จัดการรูปภาพ
+                if (imageFile != null)
+                {
+                    using var memoryStream = new MemoryStream();
+                    await imageFile.CopyToAsync(memoryStream);
+                    var imageBytes = memoryStream.ToArray();
+
+                    product.ImageBase64 = Convert.ToBase64String(imageBytes);
+                    product.ImageType = imageFile.ContentType;
                 }
 
-                // ตรวจสอบบาร์โค้ดซ้ำ (ยกเว้นรายการปัจจุบัน)
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "เพิ่มสินค้าเรียบร้อย" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "เกิดข้อผิดพลาด: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update([FromForm] Product product, IFormFile? imageFile)
+        {
+            try
+            {
+                var existingProduct = await _context.Products.FindAsync(product.Id);
+                if (existingProduct == null)
+                {
+                    return Json(new { success = false, message = "ไม่พบสินค้า" });
+                }
+
+                // ตรวจสอบบาร์โค้ดซ้ำ (ยกเว้นตัวเอง)
                 var existingBarcode = await _context.Products
-                    .AnyAsync(p => p.Barcode == product.Barcode && p.Id != product.Id);
+                    .AnyAsync(p => p.Barcode == product.Barcode
+                                  && p.Id != product.Id
+                                  && p.IsActive);
 
                 if (existingBarcode)
                 {
                     return Json(new { success = false, message = "บาร์โค้ดนี้มีในระบบแล้ว" });
                 }
 
-                // ตรวจสอบหมวดหมู่
-                if (product.CategoryId == 0)
+                // จัดการรูปภาพ
+                if (imageFile != null)
                 {
-                    return Json(new { success = false, message = "กรุณาเลือกหมวดหมู่" });
-                }
+                    using var memoryStream = new MemoryStream();
+                    await imageFile.CopyToAsync(memoryStream);
+                    var imageBytes = memoryStream.ToArray();
 
-                var category = await _context.Categories.FindAsync(product.CategoryId);
-                if (category == null)
-                {
-                    return Json(new { success = false, message = "ไม่พบหมวดหมู่ที่เลือก" });
-                }
-
-                // ดึงข้อมูลเดิม
-                var existingProduct = await _context.Products.FindAsync(product.Id);
-                if (existingProduct == null)
-                {
-                    return Json(new { success = false, message = "ไม่พบสินค้าที่ต้องการแก้ไข" });
+                    existingProduct.ImageBase64 = Convert.ToBase64String(imageBytes);
+                    existingProduct.ImageType = imageFile.ContentType;
                 }
 
                 // อัพเดตข้อมูล
@@ -171,7 +185,6 @@ namespace POS.Web.Controllers
                 existingProduct.CategoryId = product.CategoryId;
 
                 await _context.SaveChangesAsync();
-
                 return Json(new { success = true });
             }
             catch (Exception ex)
@@ -181,24 +194,26 @@ namespace POS.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete([FromBody] int id)
         {
             try
             {
                 var product = await _context.Products.FindAsync(id);
                 if (product == null)
-                    return NotFound();
+                {
+                    return Json(new { success = false, message = "ไม่พบสินค้า" });
+                }
 
-                _context.Products.Remove(product);
+                product.IsActive = false;  // Soft delete
                 await _context.SaveChangesAsync();
-                return Json(new { success = true });
+
+                return Json(new { success = true, message = "ลบสินค้าเรียบร้อย" });
             }
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
             }
         }
-
         // Add Categories
 
         [HttpPost]
@@ -373,7 +388,7 @@ namespace POS.Web.Controllers
             }
         }
 
-        [HttpGet("GetProduct/{id}")]
+        [HttpGet("Product/GetProduct/{id}")]
         public async Task<IActionResult> GetProduct(int id)
         {
             try
@@ -384,18 +399,50 @@ namespace POS.Web.Controllers
 
                 if (product == null)
                 {
-                    return NotFound();
+                    return Json(new { success = false, message = "ไม่พบสินค้า" });
                 }
+
+                return Json(new 
+                { 
+                    success = true, 
+                    data = new
+                    {
+                        id = product.Id,
+                        categoryId = product.CategoryId,
+                        name = product.Name,
+                        barcode = product.Barcode,
+                        price = product.Price,
+                        stock = product.Stock,
+                        status = product.Status,
+                        imageBase64 = product.ImageBase64,
+                        imageType = product.ImageType
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }        
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus([FromBody] int id)
+        {
+            try
+            {
+                var product = await _context.Products.FindAsync(id);
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "ไม่พบสินค้า" });
+                }
+
+                product.Status = !product.Status;
+                await _context.SaveChangesAsync();
 
                 return Json(new
                 {
-                    id = product.Id,
-                    name = product.Name,
-                    barcode = product.Barcode,
-                    price = product.Price,
-                    stock = product.Stock,
-                    categoryId = product.CategoryId,
-                    categoryName = product.Category?.Name
+                    success = true,
+                    newStatus = product.Status,
+                    message = product.Status ? "เปิดการขายสินค้าแล้ว" : "ปิดการขายสินค้าชั่วคราว"
                 });
             }
             catch (Exception ex)
@@ -403,6 +450,7 @@ namespace POS.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
 
     }
 }

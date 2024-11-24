@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using POS.Web.Data;
 
@@ -11,9 +12,11 @@ using POS.Web.Data;
 namespace POS.Web.Migrations
 {
     [DbContext(typeof(POSDbContext))]
-    partial class POSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241124073438_AddProductStatus")]
+    partial class AddProductStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

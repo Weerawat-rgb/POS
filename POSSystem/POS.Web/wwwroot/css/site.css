@@ -37,3 +37,19 @@ body {
   z-index: 1050;
 }
 
+/* Custom Switch Style */
+.form-switch .form-check-input {
+  width: 3em;
+  height: 1.5em;
+  cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.form-switch .form-check-input:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
