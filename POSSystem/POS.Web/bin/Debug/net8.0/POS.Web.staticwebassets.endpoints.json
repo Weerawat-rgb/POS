@@ -167,51 +167,6 @@
       ]
     },
     {
-      "Route": "css/site.a8c76nqh7f.css",
-      "AssetFile": "css/site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1107"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 24 Nov 2024 08:06:11 GMT"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "a8c76nqh7f"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI="
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        }
-      ]
-    },
-    {
       "Route": "css/site.css",
       "AssetFile": "css/site.css",
       "Selectors": [],
@@ -226,7 +181,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1107"
+          "Value": "3099"
         },
         {
           "Name": "Content-Type",
@@ -234,17 +189,62 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI=\""
+          "Value": "\"MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 24 Nov 2024 08:06:11 GMT"
+          "Value": "Thu, 05 Dec 2024 06:26:58 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI="
+          "Value": "sha256-MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.o6o7ixew1k.css",
+      "AssetFile": "css/site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3099"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 05 Dec 2024 06:26:58 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "o6o7ixew1k"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0="
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
         }
       ]
     },
@@ -331,6 +331,51 @@
       ]
     },
     {
+      "Route": "js/sale.435nfohs2e.js",
+      "AssetFile": "js/sale.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "10065"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 05 Dec 2024 07:04:34 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "435nfohs2e"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg="
+        },
+        {
+          "Name": "label",
+          "Value": "js/sale.js"
+        }
+      ]
+    },
+    {
       "Route": "js/sale.js",
       "AssetFile": "js/sale.js",
       "Selectors": [],
@@ -345,7 +390,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "9968"
+          "Value": "10065"
         },
         {
           "Name": "Content-Type",
@@ -353,62 +398,17 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI=\""
+          "Value": "\"gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 23 Nov 2024 10:10:43 GMT"
+          "Value": "Thu, 05 Dec 2024 07:04:34 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI="
-        }
-      ]
-    },
-    {
-      "Route": "js/sale.wkox6ydeng.js",
-      "AssetFile": "js/sale.js",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "9968"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sat, 23 Nov 2024 10:10:43 GMT"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "wkox6ydeng"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI="
-        },
-        {
-          "Name": "label",
-          "Value": "js/sale.js"
+          "Value": "sha256-gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg="
         }
       ]
     },

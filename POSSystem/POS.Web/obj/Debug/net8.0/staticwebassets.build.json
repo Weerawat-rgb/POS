@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "0+S6dYyQO5fq+ojX9mTzoiUUxaKQeBW3tEwFN+bxNFs=",
+  "Hash": "VjV7T1kwYkKjGAHR8F4eRfYIjbHg1RsljiXbVh0D0MY=",
   "Source": "POS.Web",
   "BasePath": "_content/POS.Web",
   "Mode": "Default",
@@ -94,8 +94,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "a8c76nqh7f",
-      "Integrity": "qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI=",
+      "Fingerprint": "o6o7ixew1k",
+      "Integrity": "MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -136,8 +136,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "wkox6ydeng",
-      "Integrity": "UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI=",
+      "Fingerprint": "435nfohs2e",
+      "Integrity": "gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\sale.js"
@@ -1508,51 +1508,6 @@
       ]
     },
     {
-      "Route": "css/site.a8c76nqh7f.css",
-      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\site.css",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1107"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/css"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 24 Nov 2024 08:06:11 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "a8c76nqh7f"
-        },
-        {
-          "Name": "label",
-          "Value": "css/site.css"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI="
-        }
-      ]
-    },
-    {
       "Route": "css/site.css",
       "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -1563,7 +1518,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1107"
+          "Value": "3099"
         },
         {
           "Name": "Content-Type",
@@ -1571,11 +1526,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI=\""
+          "Value": "\"MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 24 Nov 2024 08:06:11 GMT"
+          "Value": "Thu, 05 Dec 2024 06:26:58 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1585,7 +1540,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-qpsAUHy7KZRT6f/kWgfQp3FIWPdvTskOjP3wqdIfSBI="
+          "Value": "sha256-MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0="
+        }
+      ]
+    },
+    {
+      "Route": "css/site.o6o7ixew1k.css",
+      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\site.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "3099"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 05 Dec 2024 06:26:58 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "o6o7ixew1k"
+        },
+        {
+          "Name": "label",
+          "Value": "css/site.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-MMxdZfLkMOo7TJkNc5Qsapbm+QuwHLjMmQGytvAIRz0="
         }
       ]
     },
@@ -1672,6 +1672,51 @@
       ]
     },
     {
+      "Route": "js/sale.435nfohs2e.js",
+      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "10065"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 05 Dec 2024 07:04:34 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "435nfohs2e"
+        },
+        {
+          "Name": "label",
+          "Value": "js/sale.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg="
+        }
+      ]
+    },
+    {
       "Route": "js/sale.js",
       "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
       "Selectors": [],
@@ -1682,7 +1727,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "9968"
+          "Value": "10065"
         },
         {
           "Name": "Content-Type",
@@ -1690,11 +1735,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI=\""
+          "Value": "\"gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 23 Nov 2024 10:10:43 GMT"
+          "Value": "Thu, 05 Dec 2024 07:04:34 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1704,52 +1749,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI="
-        }
-      ]
-    },
-    {
-      "Route": "js/sale.wkox6ydeng.js",
-      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "9968"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "text/javascript"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sat, 23 Nov 2024 10:10:43 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "wkox6ydeng"
-        },
-        {
-          "Name": "label",
-          "Value": "js/sale.js"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-UCeiOAr1euCQjsUutpbooj9Rz+eSaeuBZtcGcQt8rnI="
+          "Value": "sha256-gKe2jWiP30LWTRAJiVCs5Rp0/dZXp2ql233R+60EQlg="
         }
       ]
     },

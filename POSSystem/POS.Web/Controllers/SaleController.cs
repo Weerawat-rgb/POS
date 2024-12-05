@@ -14,29 +14,90 @@ namespace POS.Web.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            ViewBag.Categories = await _context.Categories
+                .Where(c => c.IsActive)
+                .Select(c => new
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ProductCount = c.Products.Count(p => p.IsActive && p.Status)
+                })
+                .ToListAsync();
+
+            ViewBag.Products = await _context.Products
+                .Where(p => p.IsActive && p.Status)
+                .Select(p => new
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Barcode = p.Barcode,
+                    Price = p.Price,
+                    Stock = p.Stock,  
+                    ImageBase64 = p.ImageBase64,
+                    ImageType = p.ImageType
+                })
+                .Take(12) // แสดง 12 รายการแรก
+                .ToListAsync();
+
             return View();
         }
+        // public IActionResult Index()
+        // {
+        //     return View();
+        // }
+
 
         [HttpGet]
         public async Task<IActionResult> GetProductByBarcode(string barcode)
         {
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Barcode == barcode);
-
-            if (product == null)
-                return NotFound();
-
-            return Json(new
+            try
             {
-                id = product.Id,
-                name = product.Name,
-                price = product.Price,
-                stock = product.Stock,
-                categoryName = product.Category?.Name
-            });
+                var product = await _context.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.Barcode == barcode);
+
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "ไม่พบรหัสสินค้านี้" });
+                }
+
+                if (!product.IsActive)
+                {
+                    return Json(new { success = false, message = "สินค้าถูกปิดการใช้งาน" });
+                }
+
+                if (!product.Status)
+                {
+                    return Json(new { success = false, message = "สินค้าถูกปิดการขาย" });
+                }
+
+                if (product.Stock <= 0)
+                {
+                    return Json(new { success = false, message = "สินค้าหมด" });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    product = new
+                    {
+                        id = product.Id,
+                        barcode = product.Barcode,
+                        name = product.Name,
+                        price = product.Price,
+                        stock = product.Stock,
+                        categoryName = product.Category?.Name,
+                        imageBase64 = product.ImageBase64,
+                        imageType = product.ImageType
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"เกิดข้อผิดพลาด: {ex.Message}" });
+            }
         }
 
         [HttpPost]
@@ -70,7 +131,7 @@ namespace POS.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> PrintReceipt(int id)
         {
@@ -105,5 +166,115 @@ namespace POS.Web.Controllers
 
             return $"{prefix}{sequence:D4}";
         }
+
+        [HttpGet]
+        public async Task<IActionResult> SearchProducts(string searchTerm)
+        {
+            try
+            {
+                var products = await _context.Products
+                    .Include(p => p.Category)
+                    .Where(p => p.IsActive && p.Status &&
+                        (p.Barcode.Contains(searchTerm) ||
+                         p.Name.Contains(searchTerm)))
+                    .Take(10)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        barcode = p.Barcode ?? "",
+                        name = p.Name ?? "",
+                        price = p.Price,
+                        stock = p.Stock,
+                        categoryName = p.Category != null ? p.Category.Name : "ไม่ระบุหมวดหมู่",  // ตรวจสอบ null ก่อนเข้าถึง Name
+                        imageBase64 = p.ImageBase64 ?? "",
+                        imageType = p.ImageType ?? ""
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, products });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            try
+            {
+                var products = await _context.Products
+                    .Where(p => p.IsActive && p.Status)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        barcode = p.Barcode,
+                        name = p.Name,
+                        price = p.Price,
+                        stock = p.Stock,
+                        imageBase64 = p.ImageBase64,
+                        imageType = p.ImageType
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, products });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetCategories()
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Where(c => c.IsActive)
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        name = c.Name,
+                        productCount = _context.Products.Count(p => p.CategoryId == c.Id && p.IsActive && p.Status)
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, categories });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // API ดึงสินค้าตามหมวดหมู่ 
+        [HttpGet]
+        public async Task<IActionResult> GetProductsByCategory(int categoryId)
+        {
+            try
+            {
+                var products = await _context.Products
+                    .Where(p => p.CategoryId == categoryId && p.IsActive && p.Status)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        barcode = p.Barcode,
+                        name = p.Name,
+                        price = p.Price,
+                        stock = p.Stock,
+                        imageBase64 = p.ImageBase64,
+                        imageType = p.ImageType
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, products });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
+
 }

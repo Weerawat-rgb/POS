@@ -1,126 +1,501 @@
 @{
     ViewData["Title"] = "ขายสินค้า";
 }
-
-<div class="container-fluid">
-    <div class="row">
-        <!-- ส่วนซ้าย: รายการสินค้าและค้นหา -->
-        <div class="col-md-7">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white py-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <h4 class="mb-0">🛍️ ขายสินค้า</h4>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" id="barcodeInput" class="form-control" 
-                                       placeholder="สแกนบาร์โค้ด..." autofocus>
-                                <button class="btn btn-light" type="button" id="searchBtn">
-                                    🔍 ค้นหา
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row" id="productGrid">
-                        <!-- สินค้าจะถูกเพิ่มที่นี่ด้วย JavaScript -->
-                    </div>
-                </div>
+<div class="row vh-100 g-0">
+    <!-- ส่วนซ้าย (2/3) -->
+    <div class="col-md-8 d-flex flex-column bg-light">
+        <!-- ช่องค้นหา -->
+        <div class="p-3 border-bottom bg-white shadow-sm">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text border-0 bg-white">
+                    <i class="bi bi-search text-primary"></i>
+                </span>
+                <input type="text" id="barcodeInput" class="form-control border-0 shadow-none"
+                    placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." autofocus>
+            </div>
+            <!-- ผลการค้นหา -->
+            <div id="searchResults" class="position-absolute shadow-lg bg-white rounded-3 mt-1"
+                style="z-index: 1000; width: calc(66.66% - 2rem); left: 1rem;">
             </div>
         </div>
 
-        <!-- ส่วนขวา: ใบเสร็จ -->
-        <div class="col-md-5">
-            <div class="card receipt-card">
-                <div class="card-header bg-white py-3">
-                    <div class="text-center bill-header">
-                        <h3 class="mb-0">🏪 POS SYSTEM</h3>
-                        <small class="text-muted">ใบเสร็จรับเงิน</small>
-                    </div>
-                    <div class="status-bar mt-3">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="date-time" id="currentDate"></div>
-                            </div>
-                            <div class="col-6 text-end">
-                                <div class="date-time" id="currentTime"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table receipt-table mb-0">
-                        <thead class="table-header">
-                            <tr>
-                                <th>รายการ</th>
-                                <th class="text-end">ราคา</th>
-                                <th class="text-center" style="width: 80px;">จำนวน</th>
-                                <th class="text-end">รวม</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="saleItems">
-                            <!-- รายการสินค้าจะถูกเพิ่มที่นี่ -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="card-body">
-                    <div class="total-section">
-                        <div class="row">
-                            <div class="col-6">รวมเงิน</div>
-                            <div class="col-6 text-end money-text" id="subtotal">0.00</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">ภาษี (7%)</div>
-                            <div class="col-6 text-end money-text" id="vat">0.00</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6"><strong>ยอดสุทธิ</strong></div>
-                            <div class="col-6 text-end money-text total-amount" id="total">0.00</div>
-                        </div>
-                    </div>
-
-                    <div class="mt-3">
-                        <div class="mb-3">
-                            <label class="form-label">รับเงิน</label>
-                            <input type="number" id="received" class="form-control money-text" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">เงินทอน</label>
-                            <input type="text" id="change" class="form-control money-text" readonly />
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button id="paymentBtn" class="btn btn-success btn-lg">
-                                💰 ชำระเงิน (F5)
+        <!-- พื้นที่แสดงสินค้า -->
+        <div class="row g-0 flex-grow-1">
+            <!-- หมวดหมู่ด้านซ้าย -->
+            <div class="col-3 bg-white shadow-sm" style="height: calc(100vh - 80px); overflow-y: auto;">
+                <div class="p-3">
+                    <h6 class="text-uppercase text-muted mb-3">หมวดหมู่สินค้า</h6>
+                    <div id="categoryList" class="d-flex flex-column gap-2">
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <button class="btn btn-light w-100 text-start position-relative hover-scale"
+                                onclick="loadProductsByCategory(@category.Id)">
+                                <div class="d-flex justify-content-between align-items-center py-1">
+                                    <span>@category.Name</span>
+                                    <span class="badge bg-primary rounded-pill">@category.ProductCount</span>
+                                </div>
                             </button>
-                            <button id="cancelBtn" class="btn btn-outline-danger">
-                                ❌ ยกเลิก (F4)
-                            </button>
-                        </div>
+                        }
                     </div>
                 </div>
+            </div>
+
+            <!-- รายการสินค้าตรงกลาง -->
+            <div class="col-9 bg-light position-relative" style="height: calc(100vh - 80px);">
+            <div id="categoryProducts" class="h-100 p-3" style="overflow-y: auto;">
+                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                    @foreach (var product in ViewBag.Products)
+                    {
+                        <div class="col">
+                            <div class="card h-100 border-0 shadow-sm product-card">
+                                <div class="position-relative">
+                                    @if (!string.IsNullOrEmpty(product.ImageBase64))
+                                    {
+                                        <img src="data:@product.ImageType;base64,@product.ImageBase64"
+                                            class="card-img-top p-3"
+                                            style="height: 200px; object-fit: contain;"
+                                            alt="@product.Name">
+                                    }
+                                    else
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                            style="height: 200px;">
+                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    }
+                                    <!-- ป้ายแสดงสถานะสินค้า (ถ้ามี) -->
+                                    @if (product.Stock <= 0)
+                                    {
+                                        <span class="position-absolute top-0 end-0 m-2 badge bg-danger">
+                                            สินค้าหมด
+                                        </span>
+                                    }
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title text-truncate mb-1">@product.Name</h6>
+                                    <small class="text-muted mb-2">@product.Barcode</small>
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h5 class="text-primary mb-0 fw-bold">฿@product.Price.ToString("N2")</h5>
+                                            <button class="btn btn-primary btn-sm rounded-pill px-3 add-to-cart"
+                                                onclick="addToCart(@Json.Serialize(product))"
+                                                @(product.Stock <= 0 ? "disabled" : "")>
+                                                <i class="bi bi-plus-lg me-1"></i>เพิ่ม
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ส่วนขวา (1/3) - บิลสรุปรายการ -->
+    <div class="col-md-4">
+        <div class="receipt-container h-100 d-flex flex-column bg-white">
+            <div class="p-3 bg-gradient text-white" style="background: linear-gradient(45deg, #2196F3, #1976D2)">
+                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-receipt me-2"></i>รายการสินค้า</span>
+                    <small id="currentDateTime" style="opacity: 0.8"></small>
+                </h5>
+            </div>
+
+            <div class="flex-grow-1 overflow-auto px-3">
+                <table class="table table-borderless receipt-table">
+                    <thead class="sticky-top">
+                        <tr class="text-muted">
+                            <th>สินค้า</th>
+                            <th class="text-end">ราคา</th>
+                            <th class="text-center" style="width: 80px;">จำนวน</th>
+                            <th class="text-end">รวม</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="border-top p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">รวมทั้งหมด</h5>
+                    <h3 class="mb-0 text-primary fw-bold" id="cartTotal">฿0.00</h3>
+                </div>
+                <button class="btn btn-success btn-lg w-100 rounded-pill shadow" onclick="processCheckout()">
+                    <i class="bi bi-cash-coin me-2"></i>ชำระเงิน
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    .product-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+    }
+
+    .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
+    }
+
+    .product-card .card-img-top {
+    transition: all 0.3s ease;
+    }
+
+    .product-card:hover .card-img-top {
+    transform: scale(1.05);
+    }
+
+    .add-to-cart {
+    opacity: 0.9;
+    transition: all 0.2s ease;
+    }
+
+    .product-card:hover .add-to-cart {
+    opacity: 1;
+    transform: scale(1.05);
+    }
+
+    .add-to-cart:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Custom scrollbar */
+    #categoryProducts::-webkit-scrollbar {
+    width: 8px;
+    }
+
+    #categoryProducts::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+    }
+
+    #categoryProducts::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+    }
+
+    #categoryProducts::-webkit-scrollbar-thumb:hover {
+    background: #999;
+    }
+
+    /* Responsive grid adjustments */
+    @@media (min-width: 1400px) {
+    .row-cols-lg-4 > * {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+    }
+
+    @@media (min-width: 1600px) {
+    .row-cols-xl-5 > * {
+        flex: 0 0 auto;
+        width: 20%;
+    }
+    }
+
+
+    .hover-scale {
+        transition: transform 0.2s;
+    }
+
+    .hover-scale:hover {
+        transform: translateY(-2px);
+    }
+
+    .receipt-table {
+        font-size: 0.9rem;
+    }
+
+    .receipt-table td {
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed #dee2e6;
+    }
+
+    .sticky-top {
+        background: white;
+        backdrop-filter: blur(8px);
+    }
+</style>
 @section Scripts {
     <script src="~/js/sale.js"></script>
     <script>
         function updateDateTime() {
             const now = new Date();
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            
-            document.getElementById('currentDate').textContent = new Intl.DateTimeFormat('th-TH', dateOptions).format(now);
-            document.getElementById('currentTime').textContent = new Intl.DateTimeFormat('th-TH', timeOptions).format(now);
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent =
+                now.toLocaleString('th-TH', options);
         }
-        
+
         setInterval(updateDateTime, 1000);
         updateDateTime();
+
+        // เรียกครั้งแรกทันทีเมื่อโหลดหน้า
+        document.addEventListener('DOMContentLoaded', updateDateTime);
+
+        $(document).ready(function () {
+            $('#barcodeInput').keypress(function (e) {
+                if (e.which == 13) {  // Enter key
+                    searchProducts();
+                }
+            });
+
+            window.selectProduct = function (product) {
+                addToCart(product);
+                clearSearch();
+            };
+
+        });
+        // เพิ่ม debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ปรับฟังก์ชัน searchProducts ให้รองรับ realtime
+        $(document).ready(function () {
+            const debouncedSearch = debounce(function (value) {
+                if (value.length >= 1) { // เริ่มค้นหาเมื่อพิมพ์อย่างน้อย 1 ตัวอักษร
+                    $.get('/Sale/SearchProducts', { searchTerm: value })
+                        .done(function (response) {
+                            if (response.success) {
+                                if (!response.products || response.products.length === 0) {
+                                    $('#searchResults').html('<div class="alert alert-info">ไม่พบสินค้า</div>');
+                                    return;
+                                }
+
+                                if (response.products.length === 1) {
+                                    addToCart(response.products[0]);
+                                    $('#barcodeInput').val(''); // เคลียร์ช่องค้นหา
+                                    $('#searchResults').empty(); // ซ่อนผลการค้นหา
+                                } else {
+                                    // แสดงผลการค้นหาใต้ช่องค้นหา
+                                    showSearchResults(response.products);
+                                }
+                            } else {
+                                $('#searchResults').html(`<div class="alert alert-danger">${response.message || 'เกิดข้อผิดพลาดในการค้นหา'}</div>`);
+                            }
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            $('#searchResults').html(`<div class="alert alert-danger">เกิดข้อผิดพลาดในการเชื่อมต่อ: ${errorThrown || 'Unknown error'}</div>`);
+                        });
+                } else {
+                    $('#searchResults').empty(); // ซ่อนผลการค้นหาเมื่อไม่มีข้อความ
+                }
+            }, 300); // รอ 300ms หลังจากพิมพ์เสร็จ
+
+            // เพิ่ม event listener สำหรับการพิมพ์
+            $('#barcodeInput').on('input', function () {
+                const value = $(this).val()?.trim() ?? "";
+                debouncedSearch(value);
+            });
+        });
+
+
+        // ฟังก์ชันแสดงผลการค้นหาแบบ dropdown
+        function showSearchResults(products) {
+            currentSelection = -1; // reset selection
+
+            const resultsHtml = `
+                                    <div class="list-group mt-2">
+                                        ${products.map((p, index) => `
+                                            <button type="button" 
+                                                class="list-group-item list-group-item-action py-2" 
+                                                data-product='${JSON.stringify(p)}'
+                                                data-index="${index}"
+                                                onmouseover="handleMouseOver(${index})"
+                                                onclick='selectProduct(${JSON.stringify(p)})'>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <div><strong>${p.barcode || 'ไม่มีบาร์โค้ด'}</strong> - ${p.name || 'ไม่มีชื่อ'}</div>
+                                                        <small class="text-muted">
+                                                            หมวดหมู่: ${p.categoryName || 'ไม่ระบุ'} | 
+                                                            คงเหลือ: ${p.stock ?? 0} ชิ้น
+                                                        </small>
+                                                    </div>
+                                                    <div class="text-primary fw-bold">${p.price ?? 0} บาท</div>
+                                                </div>
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                `;
+            $('#searchResults').html(resultsHtml);
+        }
+
+        function handleMouseOver(index) {
+            currentSelection = index;
+            highlightSelection($('#searchResults .list-group-item'));
+        }
+        const style = `
+                                <style>
+                                    #searchResults {
+                                        max-height: 300px;
+                                        overflow-y: auto;
+                                    }
+                                    .list-group-item.active {
+                                        background-color: #e9ecef;
+                                        border-color: #dee2e6;
+                                        color: #000;
+                                    }
+                                    .list-group-item:hover {
+                                        background-color: #e9ecef;
+                                    }
+                                </style>
+                            `;
+        $('head').append(style);
+
+
+        let currentSelection = -1; // track selected item
+        // จัดการ keyboard events
+        $('#barcodeInput').on('keydown', function (e) {
+            const results = $('#searchResults .list-group-item');
+            const maxIndex = results.length - 1;
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (results.length > 0) {
+                        currentSelection = Math.min(currentSelection + 1, maxIndex);
+                        highlightSelection(results);
+                    }
+                    break;
+
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (results.length > 0) {
+                        currentSelection = Math.max(currentSelection - 1, 0);
+                        highlightSelection(results);
+                    }
+                    break;
+
+                case 'Enter':
+                    e.preventDefault();
+                    if (currentSelection >= 0 && currentSelection <= maxIndex) {
+                        // เลือกสินค้าที่ highlight อยู่
+                        const selectedProduct = JSON.parse(
+                            results.eq(currentSelection).attr('data-product')
+                        );
+                        selectProduct(selectedProduct);
+                    }
+                    break;
+
+                case 'Escape':
+                    clearSearch();
+                    break;
+            }
+        });
+
+        function highlightSelection(results) {
+            results.removeClass('active');
+            if (currentSelection >= 0) {
+                const selected = results.eq(currentSelection);
+                selected.addClass('active');
+                // scroll if needed
+                const container = $('#searchResults');
+                const position = selected.position().top;
+                const scrollTop = container.scrollTop();
+                const containerHeight = container.height();
+
+                if (position < 0) {
+                    container.scrollTop(scrollTop + position);
+                } else if (position + selected.outerHeight() > containerHeight) {
+                    container.scrollTop(scrollTop + position - containerHeight + selected.outerHeight());
+                }
+            }
+        }
+
+        // ฟังก์ชันเพิ่มสินค้าลงในตะกร้า
+        function addToCart(product) {
+            // ตรวจสอบว่ามีสินค้านี้ในตะกร้าแล้วหรือไม่
+            const existingRow = $(`#cart-row-${product.id}`);
+
+            if (existingRow.length > 0) {
+                // ถ้ามีแล้ว เพิ่มจำนวน
+                const qtyInput = existingRow.find('.qty-input');
+                const currentQty = parseInt(qtyInput.val());
+                qtyInput.val(currentQty + 1);
+                updateRowTotal(product.id);
+            } else {
+                // ถ้ายังไม่มี เพิ่มแถวใหม่
+                const newRow = `
+                                    <tr id="cart-row-${product.id}">
+                                        <td>
+                                            ${product.name}
+                                            <br>
+                                            <small class="text-muted">${product.barcode}</small>
+                                        </td>
+                                        <td class="text-end">${product.price.toFixed(2)}</td>
+                                        <td>
+                                            <input type="number" class="form-control form-control-sm qty-input" 
+                                                    value="1" min="1" max="${product.stock}"
+                                                    onchange="updateRowTotal(${product.id})">
+                                        </td>
+                                        <td class="text-end row-total">${product.price.toFixed(2)}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${product.id})">
+                                                ลบ
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                $('#cartTableBody').append(newRow);
+            }
+
+            updateCartTotal();
+            clearSearch();
+        }
+
+        // อัพเดทยอดรวมของแต่ละรายการ
+        function updateRowTotal(productId) {
+            const row = $(`#cart-row-${productId}`);
+            const price = parseFloat(row.find('td:nth-child(2)').text());
+            const qty = parseInt(row.find('.qty-input').val());
+            const total = price * qty;
+            row.find('.row-total').text(total.toFixed(2));
+            updateCartTotal();
+        }
+
+        // อัพเดทยอดรวมทั้งหมด
+        function updateCartTotal() {
+            let total = 0;
+            $('.row-total').each(function () {
+                total += parseFloat($(this).text());
+            });
+            $('#cartTotal').text(total.toFixed(2));
+        }
+
+        // ลบสินค้าออกจากตะกร้า
+        function removeFromCart(productId) {
+            $(`#cart-row-${productId}`).remove();
+            updateCartTotal();
+        }
+
+        // เคลียร์การค้นหา
+        function clearSearch() {
+            $('#barcodeInput').val('').focus();
+            $('#searchResults').empty();
+        }
+
+
     </script>
 }

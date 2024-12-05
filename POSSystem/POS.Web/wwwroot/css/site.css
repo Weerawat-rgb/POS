@@ -53,3 +53,123 @@ body {
   border-color: #198754;
   box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
 }
+
+#currentDate, #currentTime {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.category-buttons {
+  width: 200px;
+}
+
+.category-buttons .btn {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#categoryProducts {
+  margin-left: 210px;
+}
+
+@media (max-width: 768px) {
+  .category-buttons {
+      width: 100%;
+      margin-bottom: 1rem;
+  }
+  #categoryProducts {
+      margin-left: 0;
+  }
+}
+
+/* ใส่ใน site.css */
+body {
+  padding-top: 120px; /* ความสูงรวมของ navbar และ search bar */
+}
+
+/* ปรับขนาดการ์ดสินค้า */
+.product-card {
+  height: 100%;
+}
+
+.product-card .card-img-top {
+  height: 150px;
+  object-fit: contain;
+  padding: 0.5rem;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Navbar Styles */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255,255,255,.8);
+  padding: .5rem 1rem;
+  transition: all .2s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link.active {
+  color: #fff;
+  background-color: rgba(255,255,255,.1);
+  border-radius: 4px;
+}
+
+/* Layout Styles */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+/* Loading Indicator */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-content {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}

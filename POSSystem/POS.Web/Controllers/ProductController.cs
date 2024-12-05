@@ -664,8 +664,8 @@ namespace POS.Web.Controllers
                                 continue;
                             }
 
-                            // ตรวจสอบและสร้างหมวดหมู่ถ้าไม่มี
-                            Category category;
+                            // Declare category as nullable
+                            Category? category;
                             var categoryKey = categoryName.ToLower();
                             if (!existingCategories.TryGetValue(categoryKey, out category))
                             {
@@ -675,7 +675,7 @@ namespace POS.Web.Controllers
                                     IsActive = true
                                 };
                                 _context.Categories.Add(category);
-                                await _context.SaveChangesAsync(); // บันทึกเพื่อให้ได้ Id
+                                await _context.SaveChangesAsync();
                                 existingCategories.Add(categoryKey, category);
                                 newCategoryCount++;
                             }
