@@ -57,7 +57,7 @@ html {
 }
 
 .category-buttons {
-  width: 200px;
+  width: 300px;
 }
 
 .category-buttons .btn {
@@ -68,7 +68,7 @@ html {
 }
 
 #categoryProducts {
-  margin-left: 210px;
+  margin-left: 0px;
 }
 
 @media (max-width: 768px) {

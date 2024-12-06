@@ -24,14 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // // Event สำหรับรับเงิน
-    // document.getElementById('receivedAmount').addEventListener('input', calculateChange);
-
-    // Event สำหรับปุ่มชำระเงิน
-    // document.getElementById('checkoutBtn').addEventListener('click', processPayment);
-
-    // Event สำหรับปุ่มยกเลิก
-    // document.getElementById('cancelBtn').addEventListener('click', cancelSale);
 });
 
 async function searchProduct(barcode) {
@@ -295,3 +287,100 @@ document.addEventListener('wheel', function(e) {
         e.preventDefault();
     }
 }, { passive: false });
+
+
+function addToCart(product) {
+    // ป้องกันการเพิ่มสินค้าที่หมด
+    if (product.stock <= 0) {
+        toastr.warning('สินค้าหมด');
+        return;
+    }
+
+    // ค้นหารายการในตะกร้า
+    const cartBody = document.getElementById('cartTableBody');
+    let existingRow = document.querySelector(`tr[data-product-id="${product.id}"]`);
+
+    if (existingRow) {
+        // ถ้ามีสินค้านี้ในตะกร้าแล้ว เพิ่มจำนวน
+        const quantityInput = existingRow.querySelector('input[type="number"]');
+        const currentQty = parseInt(quantityInput.value);
+        quantityInput.value = currentQty + 1;
+        updateRowTotal(existingRow, product.price, currentQty + 1);
+    } else {
+        // ถ้ายังไม่มีสินค้านี้ในตะกร้า สร้างแถวใหม่
+        const newRow = document.createElement('tr');
+        newRow.setAttribute('data-product-id', product.id);
+        newRow.innerHTML = `
+            <td>
+                <div class="d-flex flex-column">
+                    <span class="text-truncate" style="max-width: 150px;">${product.name}</span>
+                    <small class="text-muted">${product.barcode}</small>
+                </div>
+            </td>
+            <td class="text-end">฿${product.price.toFixed(2)}</td>
+            <td class="text-center">
+                <input type="number" class="form-control form-control-sm px-1" 
+                       style="width: 45px;" value="1" min="1"
+                       onchange="updateQuantity(this, ${product.id}, ${product.price})">
+            </td>
+            <td class="text-end">฿${product.price.toFixed(2)}</td>
+            <td>
+                <button class="btn btn-sm text-danger" onclick="removeFromCart(${product.id})">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </td>
+        `;
+        cartBody.appendChild(newRow);
+    }
+
+    // อัพเดทยอดรวม
+    updateCartTotal();
+    
+    // แสดง notification
+    toastr.success('เพิ่มสินค้าลงตะกร้าแล้ว');
+}
+
+// ฟังก์ชันอัพเดทยอดรวมแถว
+function updateRowTotal(row, price, quantity) {
+    const totalCell = row.querySelector('td:nth-child(4)');
+    const total = price * quantity;
+    totalCell.textContent = `฿${total.toFixed(2)}`;
+    updateCartTotal();
+}
+
+// ฟังก์ชันอัพเดทยอดรวมทั้งหมด
+function updateCartTotal() {
+    const rows = document.querySelectorAll('#cartTableBody tr');
+    let total = 0;
+    
+    rows.forEach(row => {
+        const priceText = row.querySelector('td:nth-child(4)').textContent;
+        const price = parseFloat(priceText.replace('฿', ''));
+        total += price;
+    });
+    
+    document.getElementById('cartTotal').textContent = `฿${total.toFixed(2)}`;
+}
+
+// ฟังก์ชันอัพเดทจำนวนสินค้า
+function updateQuantity(input, productId, price) {
+    const row = input.closest('tr');
+    const quantity = parseInt(input.value);
+    
+    if (quantity < 1) {
+        input.value = 1;
+        updateRowTotal(row, price, 1);
+    } else {
+        updateRowTotal(row, price, quantity);
+    }
+}
+
+// ฟังก์ชันลบสินค้าออกจากตะกร้า
+function removeFromCart(productId) {
+    const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+    if (row) {
+        row.remove();
+        updateCartTotal();
+        toastr.info('ลบสินค้าออกจากตะกร้าแล้ว');
+    }
+}

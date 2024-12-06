@@ -1,24 +1,21 @@
 @{
     ViewData["Title"] = "ขายสินค้า";
 }
-<div class="row vh-100 g-0">
+<div class="row vh-100 g-0" style="margin-top: -48px; padding-top: 48px;">
     <!-- Left Section (2/3) -->
-    <div class="col-md-8 d-flex flex-column bg-gradient" style="background: linear-gradient(135deg, #fff5e6 0%, #fff 100%)">
+    <div class="col-md-8 d-flex flex-column bg-gradient"
+        style="background: linear-gradient(135deg, #F6FBF6 0%, #fff 100%)">
         <!-- Search Bar -->
         <div class="p-3 border-bottom bg-white shadow-sm">
             <div class="input-group input-group-lg">
                 <span class="input-group-text border-0 bg-white">
-                    <i class="bi bi-search" style="color: #ff9900;"></i>
+                    <i class="bi bi-search" style="color: #4CAF50;"></i>
                 </span>
-                <input type="text" id="barcodeInput"
-                    class="form-control border-0 shadow-none"
-                    placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." 
-                    style="background: #fff9f0;"
-                    autofocus>
+                <input type="text" id="barcodeInput" class="form-control border-0 shadow-none"
+                    placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." style="background: #F6FBF6;" autofocus>
             </div>
             <!-- Search Results -->
-            <div id="searchResults"
-                class="position-absolute shadow-lg bg-white rounded-3 mt-1"
+            <div id="searchResults" class="position-absolute shadow-lg bg-white rounded-3 mt-1"
                 style="z-index: 1000; width: calc(66.66% - 2rem); left: 1rem;">
             </div>
         </div>
@@ -28,69 +25,61 @@
             <!-- Left Categories -->
             <div class="col-2 bg-white shadow-sm scrollable">
                 <div class="p-3">
-                    <h6 class="text-uppercase mb-3" style="color: #ff7700;">หมวดหมู่สินค้า</h6>
+                    <h6 class="text-uppercase mb-3" style="color: #388E3C;">หมวดหมู่สินค้า</h6>
                     <div id="categoryList" class="d-flex flex-column">
                         @foreach (var category in ViewBag.Categories)
                         {
-                            <button class="category-button mb-2 rounded-pill border-0 py-2 px-3 w-100 text-start" 
-                                    style="background: linear-gradient(45deg, #fff5e6, #fff9f0); transition: all 0.3s;"
-                                    onmouseover="this.style.background='linear-gradient(45deg, #ffdb4d, #ffc107)'"
-                                    onmouseout="this.style.background='linear-gradient(45deg, #fff5e6, #fff9f0)'"
-                                    onclick="loadProductsByCategory(@category.Id)">
+                            <button class="category-button mb-2 rounded-pill border-0 py-2 px-3 w-100 text-start"
+                                style="background: linear-gradient(45deg, #fff5e6, #fff9f0); transition: all 0.3s;"
+                                onmouseover="this.style.background='linear-gradient(45deg, #ffdb4d, #ffc107)'"
+                                onmouseout="this.style.background='linear-gradient(45deg, #fff5e6, #fff9f0)'"
+                                onclick="loadProductsByCategory(@category.Id)">
                                 <span class="text-truncate">@category.Name</span>
-                                <span class="badge rounded-pill" style="background-color: #ff9900;">@category.ProductCount</span>
+                                <span class="badge rounded-pill"
+                                    style="background-color: #4CAF50;">@category.ProductCount</span>
                             </button>
                         }
                     </div>
                 </div>
             </div>
 
-            <!-- Center Products -->
-            <div class="col-10 scrollable" style="height: calc(100vh - 100px);">
-                <div id="categoryProducts" class="p-2">
-                    <div class="row g-2 row-cols-5">
+            <!-- Product Card -->
+            <div class="col-10 ps-2">
+                <div id="categoryProducts" class="p-1">
+                    <div class="row row-cols-4 row-cols-xl-5 row-cols-xxl-6 g-2">
                         @foreach (var product in ViewBag.Products)
                         {
                             <div class="col">
-                                <div class="card h-100 border-0 shadow-sm product-card" 
-                                     style="transition: transform 0.2s;"
-                                     onmouseover="this.style.transform='translateY(-5px)'"
-                                     onmouseout="this.style.transform='translateY(0)'">
+                                <!-- ย้าย onclick มาที่ card หลัก และเพิ่ม cursor: pointer -->
+                                <div class="card border-0 shadow-sm product-card h-100"
+                                    style="transition: all 0.2s; cursor: pointer;"
+                                    onclick="addToCart(@Json.Serialize(product))" @(product.Stock <= 0 ? "disabled" : "")>
+
                                     <!-- Product Image -->
                                     <div class="position-relative">
                                         @if (!string.IsNullOrEmpty(product.ImageBase64))
                                         {
                                             <img src="data:@product.ImageType;base64,@product.ImageBase64"
-                                                class="card-img-top p-2 rounded-3"
-                                                style="height: 120px; object-fit: contain;"
+                                                class="card-img-top p-2" style="height: 140px; object-fit: contain;"
                                                 alt="@product.Name">
                                         }
                                         else
                                         {
-                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center rounded-3"
-                                                style="height: 120px;">
-                                                <i class="bi bi-image" style="color: #ffb84d; font-size: 2rem;"></i>
+                                            <div class="d-flex align-items-center justify-content-center bg-light"
+                                                style="height: 140px;">
+                                                <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
                                             </div>
-                                        }
-                                        @if (product.Stock <= 0)
-                                        {
-                                            <span class="position-absolute top-0 end-0 m-2 badge" 
-                                                  style="background-color: #ff4d4d;">สินค้าหมด</span>
                                         }
                                     </div>
 
                                     <!-- Product Details -->
-                                    <div class="card-body p-2 d-flex flex-column">
-                                        <h6 class="card-title text-truncate mb-1" style="font-size: 0.95rem;">@product.Name</h6>
-                                        <small class="text-muted" style="font-size: 0.85rem;">@product.Barcode</small>
-                                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
-                                            <h6 class="mb-0" style="color: #ff9900;">฿@product.Price.ToString("N2")</h6>
-                                            <button class="btn rounded-circle p-1"
-                                                    style="background-color: #ff9900; width: 32px; height: 32px;"
-                                                    onclick="addToCart(@Json.Serialize(product))"
-                                                    @(product.Stock <= 0 ? "disabled" : "")>
-                                                <i class="bi bi-plus-lg text-white"></i>
-                                            </button>
+                                    <div
+                                        class="card-body p-2 d-flex flex-column justify-content-center align-items-center text-center">
+                                        <h6 class="card-title text-truncate mb-1 w-100" style="font-size: 0.9rem;">
+                                            @product.Name</h6>
+                                        <div class="pt-2">
+                                            <h6 class="mb-0" style="color: #4CAF50; font-size: 0.95rem;">
+                                                ฿@product.Price.ToString("N2")</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -100,43 +89,166 @@
                 </div>
             </div>
         </div>
+
+        <style>
+            /* ปรับขนาดคอลัมน์ให้เต็มพื้นที่ */
+            .row {
+                margin: 0;
+                width: 100%;
+            }
+
+            /* ลบ padding ที่ไม่จำเป็น */
+            #categoryProducts {
+                padding: 0.25rem !important;
+            }
+
+            /* ปรับให้การ์ดสินค้าเต็มพื้นที่ */
+            .product-card {
+                height: 100%;
+                margin: 0;
+            }
+
+            .product-card {
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .product-card:not([disabled]):hover {
+                transform: translateY(-2px);
+                box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+            }
+
+            .product-card:not([disabled]):active {
+                transform: translateY(0);
+            }
+
+            .product-card[disabled] {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+
+            .card-title {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                max-height: 2.8em;
+            }
+        </style>
     </div>
 
-    <!-- Right Section (1/3) - Receipt -->
-    <div class="col-md-4 bg-light">
-        <div class="receipt-container h-100 d-flex flex-column bg-white">
-            <div class="p-3" style="background: linear-gradient(45deg, #ff9900, #ff7700);">
-                <h6 class="mb-0 d-flex justify-content-between align-items-center text-white">
-                    <span><i class="bi bi-receipt"></i> รายการสินค้า</span>
-                    <small id="currentDateTime"></small>
-                </h6>
-            </div>
 
-            <div class="flex-grow-1 overflow-auto">
-                <table class="table table-sm table-borderless m-0">
-                    <thead class="sticky-top bg-white">
-                        <tr style="font-size: 0.9rem; color: #666;">
-                            <th>สินค้า</th>
-                            <th class="text-end">ราคา</th>
-                            <th class="text-center" style="width: 60px;">จำนวน</th>
-                            <th class="text-end">รวม</th>
-                            <th style="width: 30px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="cartTableBody"></tbody>
-                </table>
-            </div>
-
-            <div class="border-top p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="mb-0">รวมทั้งหมด</h6>
-                    <h5 class="mb-0" style="color: #ff7700;" id="cartTotal">฿0.00</h5>
+    <!-- Right Section (Receipt) -->
+    <div class="col-md-4 px-0" style="background: #ecf7ed;">
+        <div class="h-100 d-flex flex-column mx-3">
+            <!-- Receipt Container -->
+            <div class="receipt-container h-100 d-flex flex-column bg-white shadow-lg" style="border-radius: 16px;">
+                <!-- Receipt Header -->
+                <div class="p-2 text-center text-white"
+                    style="background: linear-gradient(45deg, #43a047, #388E3C); border-radius: 16px 16px 0 0;">
+                    <div class="d-flex justify-content-between align-items-center px-2">
+                        <h6 class="mb-0"><i class="bi bi-receipt me-2"></i>ใบเสร็จรับเงิน</h6>
+                        <small id="currentDateTime">6 ธ.ค. 2567 12:02</small>
+                    </div>
                 </div>
-                <button class="btn w-100 rounded-pill py-2"
-                    style="background: linear-gradient(45deg, #ff9900, #ff7700); color: white;"
-                    onclick="processCheckout()">
-                    <i class="bi bi-cash-coin"></i> ชำระเงิน
-                </button>
+
+                <!-- Receipt Items - Scrollable Area -->
+                <div class="flex-grow-1 overflow-auto position-relative">
+                    <table class="table table-sm table-borderless m-0">
+                        <thead class="sticky-top bg-white">
+                            <tr style="font-size: 0.9rem; color: #666;">
+                                <th>รายการ</th>
+                                <th class="text-end">ราคา</th>
+                                <th class="text-center" style="width: 70px;">จำนวน</th>
+                                <th class="text-end">รวม</th>
+                                <th style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartTableBody">
+                            <!-- Cart items will be here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Fixed Taskbar for Checkout -->
+                <div class="position-fixed bottom-0 end-0"
+                    style="width: 33.33%; height: 60px; background: #fff; border-top: 1px solid rgba(0,0,0,0.1); box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1050;">
+                    <div class="container-fluid h-100 d-flex align-items-center justify-content-between px-4">
+                        <!-- Total Amount -->
+                        <div>
+                            <small class="text-muted d-block" style="font-size: 0.8rem;">ยอดรวม</small>
+                            <h4 class="mb-0" style="color: #2e7d32;">฿650.00</h4>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <button class="btn px-4 h-75" style="background: #4CAF50; color: white; border-radius: 30px;"
+                            onclick="showPaymentMethods()">
+                            <i class="bi bi-wallet2 me-2"></i>
+                            พิมพ์บิล
+                        </button>
+                        <!-- Checkout Button -->
+                        <button class="btn px-4 h-75" style="background: #4CAF50; color: white; border-radius: 30px;"
+                            onclick="showPaymentMethods()">
+                            <i class="bi bi-wallet2 me-2"></i>
+                            ชำระเงิน
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Payment Methods Modal -->
+                <div class="modal fade" id="paymentMethodsModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: #4CAF50; color: white;">
+                                <h5 class="modal-title">เลือกวิธีชำระเงิน</h5>
+                                <button type="button" class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body p-3">
+                                <div class="row g-2">
+                                    <!-- เงินสด -->
+                                    <div class="col-6">
+                                        <button class="btn w-100 py-3 text-start border" style="background: #fff;"
+                                            onclick="handleCashPayment()">
+                                            <i class="bi bi-cash-coin me-2" style="color: #4CAF50;"></i>
+                                            <span>เงินสด</span>
+                                        </button>
+                                    </div>
+                                    <!-- โอนเงิน -->
+                                    <div class="col-6">
+                                        <button class="btn w-100 py-3 text-start border" style="background: #fff;"
+                                            onclick="handleTransferPayment()">
+                                            <i class="bi bi-bank me-2" style="color: #4CAF50;"></i>
+                                            <span>โอนเงิน</span>
+                                        </button>
+                                    </div>
+                                    <!-- บัตรเครดิต -->
+                                    <div class="col-6">
+                                        <button class="btn w-100 py-3 text-start border" style="background: #fff;"
+                                            onclick="handleCreditCardPayment()">
+                                            <i class="bi bi-credit-card me-2" style="color: #4CAF50;"></i>
+                                            <span>บัตรเครดิต</span>
+                                        </button>
+                                    </div>
+                                    <!-- คูปอง -->
+                                    <div class="col-6">
+                                        <button class="btn w-100 py-3 text-start border" style="background: #fff;"
+                                            onclick="handleCouponPayment()">
+                                            <i class="bi bi-ticket-perforated me-2" style="color: #4CAF50;"></i>
+                                            <span>คูปอง</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle me-2"></i>ยกเลิก
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -145,6 +257,10 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/site.css" />
     <style>
+        .receipt-container {
+            padding-bottom: 70px !important;
+        }
+
         .product-card {
             transition: all 0.3s ease;
             cursor: pointer;
@@ -238,8 +354,13 @@
     </style>
 }
 @section Scripts {
-    <script src="~/js/sale.js"></script>
+
     <script>
+        function showPaymentMethods() {
+            // แสดง modal หรือ drawer สำหรับเลือกวิธีการชำระเงิน
+            $('#paymentMethodsModal').modal('show');
+        }
+
         function updateDateTime() {
             const now = new Date();
             const options = {
@@ -330,28 +451,28 @@
             currentSelection = -1; // reset selection
 
             const resultsHtml = `
-                                <div class="list-group mt-2">
-                                    ${products.map((p, index) => `
-                                        <button type="button" 
-                                            class="list-group-item list-group-item-action py-2" 
-                                            data-product='${JSON.stringify(p)}'
-                                            data-index="${index}"
-                                            onmouseover="handleMouseOver(${index})"
-                                            onclick='selectProduct(${JSON.stringify(p)})'>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <div><strong>${p.barcode || 'ไม่มีบาร์โค้ด'}</strong> - ${p.name || 'ไม่มีชื่อ'}</div>
-                                                    <small class="text-muted">
-                                                        หมวดหมู่: ${p.categoryName || 'ไม่ระบุ'} | 
-                                                        คงเหลือ: ${p.stock ?? 0} ชิ้น
-                                                    </small>
-                                                </div>
-                                                <div class="text-primary fw-bold">${p.price ?? 0} บาท</div>
+                                            <div class="list-group mt-2">
+                                                ${products.map((p, index) => `
+                                                    <button type="button" 
+                                                        class="list-group-item list-group-item-action py-2" 
+                                                        data-product='${JSON.stringify(p)}'
+                                                        data-index="${index}"
+                                                        onmouseover="handleMouseOver(${index})"
+                                                        onclick='selectProduct(${JSON.stringify(p)})'>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <div><strong>${p.barcode || 'ไม่มีบาร์โค้ด'}</strong> - ${p.name || 'ไม่มีชื่อ'}</div>
+                                                                <small class="text-muted">
+                                                                    หมวดหมู่: ${p.categoryName || 'ไม่ระบุ'} | 
+                                                                    คงเหลือ: ${p.stock ?? 0} ชิ้น
+                                                                </small>
+                                                            </div>
+                                                            <div class="text-primary fw-bold">${p.price ?? 0} บาท</div>
+                                                        </div>
+                                                    </button>
+                                                `).join('')}
                                             </div>
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            `;
+                                        `;
             $('#searchResults').html(resultsHtml);
         }
 
@@ -360,21 +481,21 @@
             highlightSelection($('#searchResults .list-group-item'));
         }
         const style = `
-                                                    <style>
-                                                        #searchResults {
-                                                            max-height: 300px;
-                                                            overflow-y: auto;
-                                                        }
-                                                        .list-group-item.active {
-                                                            background-color: #e9ecef;
-                                                            border-color: #dee2e6;
-                                                            color: #000;
-                                                        }
-                                                        .list-group-item:hover {
-                                                            background-color: #e9ecef;
-                                                        }
-                                                    </style>
-                                                `;
+                                                                <style>
+                                                                    #searchResults {
+                                                                        max-height: 300px;
+                                                                        overflow-y: auto;
+                                                                    }
+                                                                    .list-group-item.active {
+                                                                        background-color: #e9ecef;
+                                                                        border-color: #dee2e6;
+                                                                        color: #000;
+                                                                    }
+                                                                    .list-group-item:hover {
+                                                                        background-color: #e9ecef;
+                                                                    }
+                                                                </style>
+                                                            `;
         $('head').append(style);
 
 
@@ -451,26 +572,26 @@
             } else {
                 // ถ้ายังไม่มี เพิ่มแถวใหม่
                 const newRow = `
-                                <tr id="cart-row-${product.id}">
-                                    <td>
-                                        ${product.name}
-                                        <br>
-                                        <small class="text-muted">${product.barcode}</small>
-                                    </td>
-                                    <td class="text-end">${product.price.toFixed(2)}</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm qty-input" 
-                                                value="1" min="1" max="${product.stock}"
-                                                onchange="updateRowTotal(${product.id})">
-                                    </td>
-                                    <td class="text-end row-total">${product.price.toFixed(2)}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger" onclick="removeFromCart(${product.id})">
-                                            ลบ
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
+                                            <tr id="cart-row-${product.id}">
+                                                <td>
+                                                    ${product.name}
+                                                    <br>
+                                                    <small class="text-muted">${product.barcode}</small>
+                                                </td>
+                                                <td class="text-end">${product.price.toFixed(2)}</td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm qty-input" 
+                                                            value="1" min="1" max="${product.stock}"
+                                                            onchange="updateRowTotal(${product.id})">
+                                                </td>
+                                                <td class="text-end row-total">${product.price.toFixed(2)}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-danger" onclick="removeFromCart(${product.id})">
+                                                        ลบ
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `;
                 $('#cartTableBody').append(newRow);
             }
 
@@ -522,6 +643,6 @@
                 e.preventDefault();
             }
         });
-
+        <script src="~/js/sale.js"></script>
     </script>
 }

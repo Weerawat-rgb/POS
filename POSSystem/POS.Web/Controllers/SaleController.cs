@@ -34,7 +34,7 @@ namespace POS.Web.Controllers
                     Name = p.Name,
                     Barcode = p.Barcode,
                     Price = p.Price,
-                    Stock = p.Stock,  
+                    Stock = p.Stock,
                     ImageBase64 = p.ImageBase64,
                     ImageType = p.ImageType
                 })
@@ -225,56 +225,57 @@ namespace POS.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-        [HttpGet]
-        public async Task<IActionResult> GetCategories()
-        {
-            try
-            {
-                var categories = await _context.Categories
-                    .Where(c => c.IsActive)
-                    .Select(c => new
-                    {
-                        id = c.Id,
-                        name = c.Name,
-                        productCount = _context.Products.Count(p => p.CategoryId == c.Id && p.IsActive && p.Status)
-                    })
-                    .ToListAsync();
+        // [HttpGet]
+        // public async Task<IActionResult> GetCategories()
+        // {
+        //     try
+        //     {
+        //         var categories = await _context.Categories
+        //             .Where(c => c.IsActive)
+        //             .Select(c => new
+        //             {
+        //                 id = c.Id,
+        //                 name = c.Name,
+        //                 productCount = _context.Products.Count(p => p.CategoryId == c.Id && p.IsActive && p.Status)
+        //             })
+        //             .ToListAsync();
 
-                return Json(new { success = true, categories });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
+        //         return Json(new { success = true, categories });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return Json(new { success = false, message = ex.Message });
+        //     }
+        // }
 
-        // API ดึงสินค้าตามหมวดหมู่ 
-        [HttpGet]
-        public async Task<IActionResult> GetProductsByCategory(int categoryId)
-        {
-            try
-            {
-                var products = await _context.Products
-                    .Where(p => p.CategoryId == categoryId && p.IsActive && p.Status)
-                    .Select(p => new
-                    {
-                        id = p.Id,
-                        barcode = p.Barcode,
-                        name = p.Name,
-                        price = p.Price,
-                        stock = p.Stock,
-                        imageBase64 = p.ImageBase64,
-                        imageType = p.ImageType
-                    })
-                    .ToListAsync();
+        // // API ดึงสินค้าตามหมวดหมู่ 
+        // [HttpGet]
+        // public async Task<IActionResult> GetProductsByCategory(int categoryId)
+        // {
+        //     try
+        //     {
+        //         var products = await _context.Products
+        //             .Where(p => p.CategoryId == categoryId && p.IsActive && p.Status)
+        //             .Select(p => new
+        //             {
+        //                 id = p.Id,
+        //                 barcode = p.Barcode,
+        //                 name = p.Name,
+        //                 price = p.Price,
+        //                 stock = p.Stock,
+        //                 imageBase64 = p.ImageBase64,
+        //                 imageType = p.ImageType
+        //             })
+        //             .ToListAsync();
 
-                return Json(new { success = true, products });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
+        //         return Json(new { success = true, products });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return Json(new { success = false, message = ex.Message });
+        //     }
+        // }
     }
+
 
 }
