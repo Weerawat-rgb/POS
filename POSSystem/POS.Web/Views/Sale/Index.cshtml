@@ -2,117 +2,125 @@
     ViewData["Title"] = "ขายสินค้า";
 }
 <div class="row vh-100 g-0">
-    <!-- ส่วนซ้าย (2/3) -->
-    <div class="col-md-8 d-flex flex-column bg-light">
-        <!-- ช่องค้นหา -->
+    <!-- Left Section (2/3) -->
+    <div class="col-md-8 d-flex flex-column bg-gradient" style="background: linear-gradient(135deg, #fff5e6 0%, #fff 100%)">
+        <!-- Search Bar -->
         <div class="p-3 border-bottom bg-white shadow-sm">
             <div class="input-group input-group-lg">
                 <span class="input-group-text border-0 bg-white">
-                    <i class="bi bi-search text-primary"></i>
+                    <i class="bi bi-search" style="color: #ff9900;"></i>
                 </span>
-                <input type="text" id="barcodeInput" class="form-control border-0 shadow-none"
-                    placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." autofocus>
+                <input type="text" id="barcodeInput"
+                    class="form-control border-0 shadow-none"
+                    placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." 
+                    style="background: #fff9f0;"
+                    autofocus>
             </div>
-            <!-- ผลการค้นหา -->
-            <div id="searchResults" class="position-absolute shadow-lg bg-white rounded-3 mt-1"
+            <!-- Search Results -->
+            <div id="searchResults"
+                class="position-absolute shadow-lg bg-white rounded-3 mt-1"
                 style="z-index: 1000; width: calc(66.66% - 2rem); left: 1rem;">
             </div>
         </div>
 
-        <!-- พื้นที่แสดงสินค้า -->
+        <!-- Products Area -->
         <div class="row g-0 flex-grow-1">
-            <!-- หมวดหมู่ด้านซ้าย -->
-            <div class="col-3 bg-white shadow-sm" style="height: calc(100vh - 80px); overflow-y: auto;">
+            <!-- Left Categories -->
+            <div class="col-2 bg-white shadow-sm scrollable">
                 <div class="p-3">
-                    <h6 class="text-uppercase text-muted mb-3">หมวดหมู่สินค้า</h6>
-                    <div id="categoryList" class="d-flex flex-column gap-2">
+                    <h6 class="text-uppercase mb-3" style="color: #ff7700;">หมวดหมู่สินค้า</h6>
+                    <div id="categoryList" class="d-flex flex-column">
                         @foreach (var category in ViewBag.Categories)
                         {
-                            <button class="btn btn-light w-100 text-start position-relative hover-scale"
-                                onclick="loadProductsByCategory(@category.Id)">
-                                <div class="d-flex justify-content-between align-items-center py-1">
-                                    <span>@category.Name</span>
-                                    <span class="badge bg-primary rounded-pill">@category.ProductCount</span>
-                                </div>
+                            <button class="category-button mb-2 rounded-pill border-0 py-2 px-3 w-100 text-start" 
+                                    style="background: linear-gradient(45deg, #fff5e6, #fff9f0); transition: all 0.3s;"
+                                    onmouseover="this.style.background='linear-gradient(45deg, #ffdb4d, #ffc107)'"
+                                    onmouseout="this.style.background='linear-gradient(45deg, #fff5e6, #fff9f0)'"
+                                    onclick="loadProductsByCategory(@category.Id)">
+                                <span class="text-truncate">@category.Name</span>
+                                <span class="badge rounded-pill" style="background-color: #ff9900;">@category.ProductCount</span>
                             </button>
                         }
                     </div>
                 </div>
             </div>
 
-            <!-- รายการสินค้าตรงกลาง -->
-            <div class="col-9 bg-light position-relative" style="height: calc(100vh - 80px);">
-            <div id="categoryProducts" class="h-100 p-3" style="overflow-y: auto;">
-                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                    @foreach (var product in ViewBag.Products)
-                    {
-                        <div class="col">
-                            <div class="card h-100 border-0 shadow-sm product-card">
-                                <div class="position-relative">
-                                    @if (!string.IsNullOrEmpty(product.ImageBase64))
-                                    {
-                                        <img src="data:@product.ImageType;base64,@product.ImageBase64"
-                                            class="card-img-top p-3"
-                                            style="height: 200px; object-fit: contain;"
-                                            alt="@product.Name">
-                                    }
-                                    else
-                                    {
-                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                            style="height: 200px;">
-                                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                                        </div>
-                                    }
-                                    <!-- ป้ายแสดงสถานะสินค้า (ถ้ามี) -->
-                                    @if (product.Stock <= 0)
-                                    {
-                                        <span class="position-absolute top-0 end-0 m-2 badge bg-danger">
-                                            สินค้าหมด
-                                        </span>
-                                    }
-                                </div>
-                                <div class="card-body d-flex flex-column">
-                                    <h6 class="card-title text-truncate mb-1">@product.Name</h6>
-                                    <small class="text-muted mb-2">@product.Barcode</small>
-                                    <div class="mt-auto">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h5 class="text-primary mb-0 fw-bold">฿@product.Price.ToString("N2")</h5>
-                                            <button class="btn btn-primary btn-sm rounded-pill px-3 add-to-cart"
-                                                onclick="addToCart(@Json.Serialize(product))"
-                                                @(product.Stock <= 0 ? "disabled" : "")>
-                                                <i class="bi bi-plus-lg me-1"></i>เพิ่ม
+            <!-- Center Products -->
+            <div class="col-10 scrollable" style="height: calc(100vh - 100px);">
+                <div id="categoryProducts" class="p-2">
+                    <div class="row g-2 row-cols-5">
+                        @foreach (var product in ViewBag.Products)
+                        {
+                            <div class="col">
+                                <div class="card h-100 border-0 shadow-sm product-card" 
+                                     style="transition: transform 0.2s;"
+                                     onmouseover="this.style.transform='translateY(-5px)'"
+                                     onmouseout="this.style.transform='translateY(0)'">
+                                    <!-- Product Image -->
+                                    <div class="position-relative">
+                                        @if (!string.IsNullOrEmpty(product.ImageBase64))
+                                        {
+                                            <img src="data:@product.ImageType;base64,@product.ImageBase64"
+                                                class="card-img-top p-2 rounded-3"
+                                                style="height: 120px; object-fit: contain;"
+                                                alt="@product.Name">
+                                        }
+                                        else
+                                        {
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center rounded-3"
+                                                style="height: 120px;">
+                                                <i class="bi bi-image" style="color: #ffb84d; font-size: 2rem;"></i>
+                                            </div>
+                                        }
+                                        @if (product.Stock <= 0)
+                                        {
+                                            <span class="position-absolute top-0 end-0 m-2 badge" 
+                                                  style="background-color: #ff4d4d;">สินค้าหมด</span>
+                                        }
+                                    </div>
+
+                                    <!-- Product Details -->
+                                    <div class="card-body p-2 d-flex flex-column">
+                                        <h6 class="card-title text-truncate mb-1" style="font-size: 0.95rem;">@product.Name</h6>
+                                        <small class="text-muted" style="font-size: 0.85rem;">@product.Barcode</small>
+                                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+                                            <h6 class="mb-0" style="color: #ff9900;">฿@product.Price.ToString("N2")</h6>
+                                            <button class="btn rounded-circle p-1"
+                                                    style="background-color: #ff9900; width: 32px; height: 32px;"
+                                                    onclick="addToCart(@Json.Serialize(product))"
+                                                    @(product.Stock <= 0 ? "disabled" : "")>
+                                                <i class="bi bi-plus-lg text-white"></i>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>
 
-    <!-- ส่วนขวา (1/3) - บิลสรุปรายการ -->
-    <div class="col-md-4">
+    <!-- Right Section (1/3) - Receipt -->
+    <div class="col-md-4 bg-light">
         <div class="receipt-container h-100 d-flex flex-column bg-white">
-            <div class="p-3 bg-gradient text-white" style="background: linear-gradient(45deg, #2196F3, #1976D2)">
-                <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-receipt me-2"></i>รายการสินค้า</span>
-                    <small id="currentDateTime" style="opacity: 0.8"></small>
-                </h5>
+            <div class="p-3" style="background: linear-gradient(45deg, #ff9900, #ff7700);">
+                <h6 class="mb-0 d-flex justify-content-between align-items-center text-white">
+                    <span><i class="bi bi-receipt"></i> รายการสินค้า</span>
+                    <small id="currentDateTime"></small>
+                </h6>
             </div>
 
-            <div class="flex-grow-1 overflow-auto px-3">
-                <table class="table table-borderless receipt-table">
-                    <thead class="sticky-top">
-                        <tr class="text-muted">
+            <div class="flex-grow-1 overflow-auto">
+                <table class="table table-sm table-borderless m-0">
+                    <thead class="sticky-top bg-white">
+                        <tr style="font-size: 0.9rem; color: #666;">
                             <th>สินค้า</th>
                             <th class="text-end">ราคา</th>
-                            <th class="text-center" style="width: 80px;">จำนวน</th>
+                            <th class="text-center" style="width: 60px;">จำนวน</th>
                             <th class="text-end">รวม</th>
-                            <th style="width: 40px;"></th>
+                            <th style="width: 30px;"></th>
                         </tr>
                     </thead>
                     <tbody id="cartTableBody"></tbody>
@@ -121,109 +129,114 @@
 
             <div class="border-top p-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="mb-0">รวมทั้งหมด</h5>
-                    <h3 class="mb-0 text-primary fw-bold" id="cartTotal">฿0.00</h3>
+                    <h6 class="mb-0">รวมทั้งหมด</h6>
+                    <h5 class="mb-0" style="color: #ff7700;" id="cartTotal">฿0.00</h5>
                 </div>
-                <button class="btn btn-success btn-lg w-100 rounded-pill shadow" onclick="processCheckout()">
-                    <i class="bi bi-cash-coin me-2"></i>ชำระเงิน
+                <button class="btn w-100 rounded-pill py-2"
+                    style="background: linear-gradient(45deg, #ff9900, #ff7700); color: white;"
+                    onclick="processCheckout()">
+                    <i class="bi bi-cash-coin"></i> ชำระเงิน
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .product-card {
-    transition: all 0.3s ease;
-    cursor: pointer;
-    background: white;
-    }
+@section Styles {
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        .product-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
 
-    .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important;
-    }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+        }
 
-    .product-card .card-img-top {
-    transition: all 0.3s ease;
-    }
+        .product-card .card-img-top {
+            transition: all 0.3s ease;
+        }
 
-    .product-card:hover .card-img-top {
-    transform: scale(1.05);
-    }
+        .product-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
 
-    .add-to-cart {
-    opacity: 0.9;
-    transition: all 0.2s ease;
-    }
+        .add-to-cart {
+            opacity: 0.9;
+            transition: all 0.2s ease;
+        }
 
-    .product-card:hover .add-to-cart {
-    opacity: 1;
-    transform: scale(1.05);
-    }
+        .product-card:hover .add-to-cart {
+            opacity: 1;
+            transform: scale(1.05);
+        }
 
-    .add-to-cart:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+        .add-to-cart:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    /* Custom scrollbar */
-    #categoryProducts::-webkit-scrollbar {
-    width: 8px;
-    }
+        /* Custom scrollbar */
+        #categoryProducts::-webkit-scrollbar {
+            width: 8px;
+        }
 
-    #categoryProducts::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-    }
+        #categoryProducts::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
 
-    #categoryProducts::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-    }
+        #categoryProducts::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
 
-    #categoryProducts::-webkit-scrollbar-thumb:hover {
-    background: #999;
-    }
+        #categoryProducts::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
 
-    /* Responsive grid adjustments */
-    @@media (min-width: 1400px) {
-    .row-cols-lg-4 > * {
-        flex: 0 0 auto;
-        width: 25%;
-    }
-    }
+        /* Responsive grid adjustments */
+        @@media (min-width: 1400px) {
+            .row-cols-lg-4>* {
+                flex: 0 0 auto;
+                width: 25%;
+            }
+        }
 
-    @@media (min-width: 1600px) {
-    .row-cols-xl-5 > * {
-        flex: 0 0 auto;
-        width: 20%;
-    }
-    }
+        @@media (min-width: 1600px) {
+            .row-cols-xl-5>* {
+                flex: 0 0 auto;
+                width: 20%;
+            }
+        }
 
 
-    .hover-scale {
-        transition: transform 0.2s;
-    }
+        .hover-scale {
+            transition: transform 0.2s;
+        }
 
-    .hover-scale:hover {
-        transform: translateY(-2px);
-    }
+        .hover-scale:hover {
+            transform: translateY(-2px);
+        }
 
-    .receipt-table {
-        font-size: 0.9rem;
-    }
+        .receipt-table {
+            font-size: 0.9rem;
+        }
 
-    .receipt-table td {
-        padding: 0.75rem 0;
-        border-bottom: 1px dashed #dee2e6;
-    }
+        .receipt-table td {
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed #dee2e6;
+        }
 
-    .sticky-top {
-        background: white;
-        backdrop-filter: blur(8px);
-    }
-</style>
+        .sticky-top {
+            background: white;
+            backdrop-filter: blur(8px);
+        }
+    </style>
+}
 @section Scripts {
     <script src="~/js/sale.js"></script>
     <script>
@@ -317,28 +330,28 @@
             currentSelection = -1; // reset selection
 
             const resultsHtml = `
-                                    <div class="list-group mt-2">
-                                        ${products.map((p, index) => `
-                                            <button type="button" 
-                                                class="list-group-item list-group-item-action py-2" 
-                                                data-product='${JSON.stringify(p)}'
-                                                data-index="${index}"
-                                                onmouseover="handleMouseOver(${index})"
-                                                onclick='selectProduct(${JSON.stringify(p)})'>
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <div><strong>${p.barcode || 'ไม่มีบาร์โค้ด'}</strong> - ${p.name || 'ไม่มีชื่อ'}</div>
-                                                        <small class="text-muted">
-                                                            หมวดหมู่: ${p.categoryName || 'ไม่ระบุ'} | 
-                                                            คงเหลือ: ${p.stock ?? 0} ชิ้น
-                                                        </small>
-                                                    </div>
-                                                    <div class="text-primary fw-bold">${p.price ?? 0} บาท</div>
+                                <div class="list-group mt-2">
+                                    ${products.map((p, index) => `
+                                        <button type="button" 
+                                            class="list-group-item list-group-item-action py-2" 
+                                            data-product='${JSON.stringify(p)}'
+                                            data-index="${index}"
+                                            onmouseover="handleMouseOver(${index})"
+                                            onclick='selectProduct(${JSON.stringify(p)})'>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div><strong>${p.barcode || 'ไม่มีบาร์โค้ด'}</strong> - ${p.name || 'ไม่มีชื่อ'}</div>
+                                                    <small class="text-muted">
+                                                        หมวดหมู่: ${p.categoryName || 'ไม่ระบุ'} | 
+                                                        คงเหลือ: ${p.stock ?? 0} ชิ้น
+                                                    </small>
                                                 </div>
-                                            </button>
-                                        `).join('')}
-                                    </div>
-                                `;
+                                                <div class="text-primary fw-bold">${p.price ?? 0} บาท</div>
+                                            </div>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            `;
             $('#searchResults').html(resultsHtml);
         }
 
@@ -347,21 +360,21 @@
             highlightSelection($('#searchResults .list-group-item'));
         }
         const style = `
-                                <style>
-                                    #searchResults {
-                                        max-height: 300px;
-                                        overflow-y: auto;
-                                    }
-                                    .list-group-item.active {
-                                        background-color: #e9ecef;
-                                        border-color: #dee2e6;
-                                        color: #000;
-                                    }
-                                    .list-group-item:hover {
-                                        background-color: #e9ecef;
-                                    }
-                                </style>
-                            `;
+                                                    <style>
+                                                        #searchResults {
+                                                            max-height: 300px;
+                                                            overflow-y: auto;
+                                                        }
+                                                        .list-group-item.active {
+                                                            background-color: #e9ecef;
+                                                            border-color: #dee2e6;
+                                                            color: #000;
+                                                        }
+                                                        .list-group-item:hover {
+                                                            background-color: #e9ecef;
+                                                        }
+                                                    </style>
+                                                `;
         $('head').append(style);
 
 
@@ -438,26 +451,26 @@
             } else {
                 // ถ้ายังไม่มี เพิ่มแถวใหม่
                 const newRow = `
-                                    <tr id="cart-row-${product.id}">
-                                        <td>
-                                            ${product.name}
-                                            <br>
-                                            <small class="text-muted">${product.barcode}</small>
-                                        </td>
-                                        <td class="text-end">${product.price.toFixed(2)}</td>
-                                        <td>
-                                            <input type="number" class="form-control form-control-sm qty-input" 
-                                                    value="1" min="1" max="${product.stock}"
-                                                    onchange="updateRowTotal(${product.id})">
-                                        </td>
-                                        <td class="text-end row-total">${product.price.toFixed(2)}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-danger" onclick="removeFromCart(${product.id})">
-                                                ลบ
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `;
+                                <tr id="cart-row-${product.id}">
+                                    <td>
+                                        ${product.name}
+                                        <br>
+                                        <small class="text-muted">${product.barcode}</small>
+                                    </td>
+                                    <td class="text-end">${product.price.toFixed(2)}</td>
+                                    <td>
+                                        <input type="number" class="form-control form-control-sm qty-input" 
+                                                value="1" min="1" max="${product.stock}"
+                                                onchange="updateRowTotal(${product.id})">
+                                    </td>
+                                    <td class="text-end row-total">${product.price.toFixed(2)}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" onclick="removeFromCart(${product.id})">
+                                            ลบ
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
                 $('#cartTableBody').append(newRow);
             }
 
@@ -496,6 +509,19 @@
             $('#searchResults').empty();
         }
 
+        // ป้องกันการ scroll ด้วย mouse wheel บนหน้าหลัก
+        document.addEventListener('wheel', function (e) {
+            if (!e.target.closest('.scrollable')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // ป้องกันการ scroll ด้วย spacebar
+        document.addEventListener('keydown', function (e) {
+            if (e.code === 'Space' && !e.target.closest('.scrollable')) {
+                e.preventDefault();
+            }
+        });
 
     </script>
 }

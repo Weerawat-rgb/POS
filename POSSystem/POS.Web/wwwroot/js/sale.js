@@ -24,14 +24,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Event สำหรับรับเงิน
-    document.getElementById('receivedAmount').addEventListener('input', calculateChange);
+    // // Event สำหรับรับเงิน
+    // document.getElementById('receivedAmount').addEventListener('input', calculateChange);
 
     // Event สำหรับปุ่มชำระเงิน
-    document.getElementById('checkoutBtn').addEventListener('click', processPayment);
+    // document.getElementById('checkoutBtn').addEventListener('click', processPayment);
 
     // Event สำหรับปุ่มยกเลิก
-    document.getElementById('cancelBtn').addEventListener('click', cancelSale);
+    // document.getElementById('cancelBtn').addEventListener('click', cancelSale);
 });
 
 async function searchProduct(barcode) {
@@ -230,38 +230,68 @@ function loadCategories() {
 }
 
 function loadProductsByCategory(categoryId) {
-    $.ajax({
-        url: '/Sale/GetProductsByCategory',
-        method: 'GET',
-        data: { categoryId: categoryId },
-        success: function (response) {
+    // ลบ active state จากปุ่มทั้งหมด
+    document.querySelectorAll('.category-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // เพิ่ม active state ให้กับปุ่มที่ถูกเลือก
+    // event.currentTarget.classList.add('active');
+    // โหลดสินค้า
+    $.get('/Sale/GetProductsByCategory', { categoryId: categoryId })
+        .done(function(response) {
             if (response.success) {
-                let html = `
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                        ${response.products.map(product => `
-                            <div class="col">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body">
-                                        <h6 class="card-title">${product.name}</h6>
-                                        <p class="card-text small text-muted">${product.barcode}</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0 text-primary">฿${product.price.toFixed(2)}</h5>
-                                            <button class="btn btn-primary btn-sm" 
-                                                    onclick="addToCart(${JSON.stringify(product)})">
-                                                เพิ่ม
-                                            </button>
-                                        </div>
+                let html = `<div class="products-grid">`;
+                response.products.forEach(product => {
+                    html += `
+                        <div class="card h-100 border-0 shadow-sm product-card">
+                            <div class="position-relative">
+                                ${product.imageBase64 
+                                    ? `<img src="data:${product.imageType};base64,${product.imageBase64}"
+                                           class="card-img-top p-3"
+                                           style="height: 200px; object-fit: contain;"
+                                           alt="${product.name}">`
+                                    : `<div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                           style="height: 200px;">
+                                           <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                       </div>`
+                                }
+                                ${product.stock <= 0 
+                                    ? `<span class="position-absolute top-0 end-0 m-2 badge bg-danger">
+                                           สินค้าหมด
+                                       </span>`
+                                    : ''
+                                }
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title text-truncate mb-1">${product.name}</h6>
+                                <small class="text-muted mb-2">${product.barcode}</small>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="text-primary mb-0 fw-bold">฿${product.price.toFixed(2)}</h5>
+                                        <button class="btn btn-primary btn-sm rounded-pill px-3 add-to-cart"
+                                                onclick="addToCart(${JSON.stringify(product)})"
+                                                ${product.stock <= 0 ? 'disabled' : ''}>
+                                            <i class="bi bi-plus-lg me-1"></i>เพิ่ม
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        `).join('')}
-                    </div>
-                `;
+                        </div>
+                    `;
+                });
+                html += '</div>';
                 $('#categoryProducts').html(html);
             }
-        },
-        error: function (xhr, status, error) {
+        })
+        .fail(function(error) {
             console.error('Error loading products:', error);
-        }
-    });
+        });
 }
+
+// ใส่ใน site.js หรือ sale.js
+document.addEventListener('wheel', function(e) {
+    if (!e.target.closest('.scrollable')) {
+        e.preventDefault();
+    }
+}, { passive: false });
