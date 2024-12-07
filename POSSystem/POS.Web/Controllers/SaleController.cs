@@ -5,15 +5,14 @@ using POS.Web.Models.Entities;
 
 namespace POS.Web.Controllers
 {
-    public class SaleController : Controller
+    [ApiController]
+    [Route("[controller]")]
+    public class SaleController(POSDbContext context) : Controller
     {
-        private readonly POSDbContext _context;
+        private readonly POSDbContext _context = context;
+        private readonly object? sale;
 
-        public SaleController(POSDbContext context)
-        {
-            _context = context;
-        }
-
+        [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
             ViewBag.Categories = await _context.Categories
@@ -43,13 +42,7 @@ namespace POS.Web.Controllers
 
             return View();
         }
-        // public IActionResult Index()
-        // {
-        //     return View();
-        // }
-
-
-        [HttpGet]
+        [HttpGet("GetProductByBarcode/{barcode}")]
         public async Task<IActionResult> GetProductByBarcode(string barcode)
         {
             try
@@ -100,39 +93,39 @@ namespace POS.Web.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ProcessSale([FromBody] Sale sale)
-        {
-            try
-            {
-                // สร้างเลขที่ใบเสร็จ
-                sale.InvoiceNumber = GenerateInvoiceNumber();
-                sale.SaleDate = DateTime.Now;
+        // [HttpGet("SearchProducts/{searchTerm?}")]
+        // public async Task<IActionResult> SearchProducts(string searchTerm)
+        // {
+        //     try
+        //     {
+        //         // สร้างเลขที่ใบเสร็จ
+        //         sale.InvoiceNumber = GenerateInvoiceNumber();
+        //         sale.SaleDate = DateTime.Now;
 
-                _context.Sales.Add(sale);
-                await _context.SaveChangesAsync();
+        //         _context.Sales.Add(sale);
+        //         await _context.SaveChangesAsync();
 
-                // อัพเดต stock
-                foreach (var detail in sale.SaleDetails)
-                {
-                    var product = await _context.Products.FindAsync(detail.ProductId);
-                    if (product != null)
-                    {
-                        product.Stock -= detail.Quantity;
-                        _context.Products.Update(product);
-                    }
-                }
-                await _context.SaveChangesAsync();
+        //         // อัพเดต stock
+        //         foreach (var detail in sale.SaleDetails)
+        //         {
+        //             var product = await _context.Products.FindAsync(detail.ProductId);
+        //             if (product != null)
+        //             {
+        //                 product.Stock -= detail.Quantity;
+        //                 _context.Products.Update(product);
+        //             }
+        //         }
+        //         await _context.SaveChangesAsync();
 
-                return Json(new { success = true, saleId = sale.Id });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
+        //         return Json(new { success = true, saleId = sale.Id });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return Json(new { success = false, message = ex.Message });
+        //     }
+        // // }
 
-        [HttpGet]
+        [HttpGet("PrintReceipt/{id}")]
         public async Task<IActionResult> PrintReceipt(int id)
         {
             var sale = await _context.Sales
@@ -147,27 +140,27 @@ namespace POS.Web.Controllers
         }
 
 
-        private string GenerateInvoiceNumber()
-        {
-            var today = DateTime.Now;
-            var prefix = $"INV{today:yyMMdd}";
-            var lastInvoice = _context.Sales
-                .Where(s => s.InvoiceNumber.StartsWith(prefix))
-                .OrderByDescending(s => s.InvoiceNumber)
-                .Select(s => s.InvoiceNumber)
-                .FirstOrDefault();
+        // private string GenerateInvoiceNumber()
+        // {
+        //     var today = DateTime.Now;
+        //     var prefix = $"INV{today:yyMMdd}";
+        //     var lastInvoice = _context.Sales
+        //         .Where(s => s.InvoiceNumber.StartsWith(prefix))
+        //         .OrderByDescending(s => s.InvoiceNumber)
+        //         .Select(s => s.InvoiceNumber)
+        //         .FirstOrDefault();
 
-            int sequence = 1;
-            if (lastInvoice != null)
-            {
-                var lastSequence = int.Parse(lastInvoice.Substring(prefix.Length));
-                sequence = lastSequence + 1;
-            }
+        //     int sequence = 1;
+        //     if (lastInvoice != null)
+        //     {
+        //         var lastSequence = int.Parse(lastInvoice.Substring(prefix.Length));
+        //         sequence = lastSequence + 1;
+        //     }
 
-            return $"{prefix}{sequence:D4}";
-        }
+        //     return $"{prefix}{sequence:D4}";
+        // }
 
-        [HttpGet]
+        [HttpGet("SearchProducts/{searchTerm?}")]
         public async Task<IActionResult> SearchProducts(string searchTerm)
         {
             try
@@ -199,7 +192,7 @@ namespace POS.Web.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("GetAllProducts")]
         public async Task<IActionResult> GetAllProducts()
         {
             try
@@ -225,57 +218,56 @@ namespace POS.Web.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
-        // [HttpGet]
-        // public async Task<IActionResult> GetCategories()
-        // {
-        //     try
-        //     {
-        //         var categories = await _context.Categories
-        //             .Where(c => c.IsActive)
-        //             .Select(c => new
-        //             {
-        //                 id = c.Id,
-        //                 name = c.Name,
-        //                 productCount = _context.Products.Count(p => p.CategoryId == c.Id && p.IsActive && p.Status)
-        //             })
-        //             .ToListAsync();
 
-        //         return Json(new { success = true, categories });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Json(new { success = false, message = ex.Message });
-        //     }
-        // }
+        [HttpGet("GetCategories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Where(c => c.IsActive) 
+                    .Select(c => new
+                    {
+                        id = c.Id,
+                        name = c.Name,
+                        productCount = _context.Products.Count(p => p.CategoryId == c.Id && p.IsActive && p.Status)
+                    })
+                    .ToListAsync();
 
-        // // API ดึงสินค้าตามหมวดหมู่ 
-        // [HttpGet]
-        // public async Task<IActionResult> GetProductsByCategory(int categoryId)
-        // {
-        //     try
-        //     {
-        //         var products = await _context.Products
-        //             .Where(p => p.CategoryId == categoryId && p.IsActive && p.Status)
-        //             .Select(p => new
-        //             {
-        //                 id = p.Id,
-        //                 barcode = p.Barcode,
-        //                 name = p.Name,
-        //                 price = p.Price,
-        //                 stock = p.Stock,
-        //                 imageBase64 = p.ImageBase64,
-        //                 imageType = p.ImageType
-        //             })
-        //             .ToListAsync();
+                return Json(new { success = true, categories });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+        [HttpGet("GetProductsByCategory/{categoryId}")]
+        public async Task<IActionResult> GetProductsByCategory(int categoryId)
+        {
+            try
+            {
+                var products = await _context.Products
+                    .Where(p => p.CategoryId == categoryId && p.IsActive && p.Status)
+                    .Select(p => new
+                    {
+                        id = p.Id,
+                        name = p.Name,
+                        price = p.Price,
+                        stock = p.Stock,
+                        imageBase64 = p.ImageBase64,
+                        imageType = p.ImageType,
+                        barcode = p.Barcode,
+                        // เพิ่มข้อมูลอื่นๆ ที่จำเป็นสำหรับ addToCart
+                    })
+                    .ToListAsync();
 
-        //         return Json(new { success = true, products });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         return Json(new { success = false, message = ex.Message });
-        //     }
-        // }
+                return Json(new { success = true, products });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
-
 
 }

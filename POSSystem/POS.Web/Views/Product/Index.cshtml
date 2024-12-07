@@ -285,31 +285,31 @@
                     tr.dataset.active = !showDeleted;
 
                     tr.innerHTML = `
-                                                                            <td>
-                                                                                <span class="category-name">${category.name}</span>
-                                                                                <input type="text" class="form-control category-edit d-none" value="${category.name}">
-                                                                            </td>
-                                                                            <td class="text-center">
-                                                                                ${category.productCount} รายการ
-                                                                            </td>
-                                                                            <td class="text-end">
-                                                                                ${!showDeleted ? `
-                                                                                    <button class="btn btn-sm btn-warning edit-btn" onclick="startEditCategory(this, ${category.id})">
-                                                                                        ✏️ แก้ไข
-                                                                                    </button>
-                                                                                    <button class="btn btn-sm btn-success save-btn d-none" onclick="saveCategory(this, ${category.id})">
-                                                                                        💾 บันทึก
-                                                                                    </button>
-                                                                                    <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.id})">
-                                                                                        🗑️ ลบ
-                                                                                    </button>
-                                                                                ` : `
-                                                                                    <button class="btn btn-sm btn-primary" onclick="restoreCategory(${category.id})">
-                                                                                        ♻️ กู้คืน
-                                                                                    </button>
-                                                                                `}
-                                                                            </td>
-                                                                        `;
+                                    <td>
+                                        <span class="category-name">${category.name}</span>
+                                        <input type="text" class="form-control category-edit d-none" value="${category.name}">
+                                    </td>
+                                    <td class="text-center">
+                                        ${category.productCount} รายการ
+                                    </td>
+                                    <td class="text-end">
+                                        ${!showDeleted ? `
+                                            <button class="btn btn-sm btn-warning edit-btn" onclick="startEditCategory(this, ${category.id})">
+                                                ✏️ แก้ไข
+                                            </button>
+                                            <button class="btn btn-sm btn-success save-btn d-none" onclick="saveCategory(this, ${category.id})">
+                                                💾 บันทึก
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.id})">
+                                                🗑️ ลบ
+                                            </button>
+                                        ` : `
+                                            <button class="btn btn-sm btn-primary" onclick="restoreCategory(${category.id})">
+                                                ♻️ กู้คืน
+                                            </button>
+                                        `}
+                                    </td>
+                                `;
 
                     tbody.appendChild(tr);
                 });

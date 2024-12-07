@@ -167,6 +167,88 @@
       ]
     },
     {
+      "Route": "css/sale.8l9v5hx1gd.css",
+      "AssetFile": "css/sale.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4432"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 07 Dec 2024 08:35:46 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8l9v5hx1gd"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs="
+        },
+        {
+          "Name": "label",
+          "Value": "css/sale.css"
+        }
+      ]
+    },
+    {
+      "Route": "css/sale.css",
+      "AssetFile": "css/sale.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4432"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 07 Dec 2024 08:35:46 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs="
+        }
+      ]
+    },
+    {
       "Route": "css/site.css",
       "AssetFile": "css/site.css",
       "Selectors": [],
@@ -331,8 +413,8 @@
       ]
     },
     {
-      "Route": "js/sale.js",
-      "AssetFile": "js/sale.js",
+      "Route": "js/sale-functions.js",
+      "AssetFile": "js/sale-functions.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -345,7 +427,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "15392"
+          "Value": "32684"
         },
         {
           "Name": "Content-Type",
@@ -353,23 +435,23 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY=\""
+          "Value": "\"NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 06 Dec 2024 08:18:26 GMT"
+          "Value": "Sat, 07 Dec 2024 13:49:54 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY="
+          "Value": "sha256-NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U="
         }
       ]
     },
     {
-      "Route": "js/sale.u4mn9edwsa.js",
-      "AssetFile": "js/sale.js",
+      "Route": "js/sale-functions.orhl6o7uep.js",
+      "AssetFile": "js/sale-functions.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -382,7 +464,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "15392"
+          "Value": "32684"
         },
         {
           "Name": "Content-Type",
@@ -390,25 +472,25 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY=\""
+          "Value": "\"NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 06 Dec 2024 08:18:26 GMT"
+          "Value": "Sat, 07 Dec 2024 13:49:54 GMT"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "u4mn9edwsa"
+          "Value": "orhl6o7uep"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY="
+          "Value": "sha256-NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U="
         },
         {
           "Name": "label",
-          "Value": "js/sale.js"
+          "Value": "js/sale-functions.js"
         }
       ]
     },

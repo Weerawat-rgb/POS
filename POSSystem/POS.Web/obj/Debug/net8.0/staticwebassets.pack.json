@@ -9,6 +9,10 @@
       "PackagePath": "staticwebassets\\css\\product.css"
     },
     {
+      "Id": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\sale.css",
+      "PackagePath": "staticwebassets\\css\\sale.css"
+    },
+    {
       "Id": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
@@ -17,8 +21,8 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
-      "Id": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
-      "PackagePath": "staticwebassets\\js\\sale.js"
+      "Id": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale-functions.js",
+      "PackagePath": "staticwebassets\\js\\sale-functions.js"
     },
     {
       "Id": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\site.js",

@@ -5,6 +5,7 @@ using POS.Web.Models.Entities;
 using OfficeOpenXml;
 using System.Text;
 
+
 namespace POS.Web.Controllers
 {
     public class ProductController : Controller
@@ -16,6 +17,25 @@ namespace POS.Web.Controllers
             _context = context;
         }
 
+        [HttpGet("category/{id}")]
+        public async Task<IActionResult> GetByCategory(int id)
+        {
+            var products = await _context.Products
+                .Where(p => p.CategoryId == id)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.Stock,
+                    p.ImageBase64,
+                    p.ImageType
+                })
+                .ToListAsync();
+
+            return Ok(products);
+        }
+        
         public async Task<IActionResult> Index()
         {
             var products = await _context.Products
@@ -54,7 +74,7 @@ namespace POS.Web.Controllers
                     {
                         id = c.Id,
                         name = c.Name,
-                        productCount = c.Products.Count
+                        productCount = c.Products.Count(p => p.IsActive)
                     })
                     .OrderBy(c => c.name)
                     .ToListAsync();
@@ -311,7 +331,7 @@ namespace POS.Web.Controllers
                 }
 
                 // ตรวจสอบว่ามีสินค้าในหมวดหมู่หรือไม่
-                if (category.Products.Any())
+                if (category.Products.Any(p => p.IsActive))
                 {
                     return Json(new
                     {

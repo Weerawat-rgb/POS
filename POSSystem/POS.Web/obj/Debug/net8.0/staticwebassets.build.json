@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "yhvnN29Qk1e10VLr3oCZ4+gQBUxesEZby67fBVCd3zU=",
+  "Hash": "pNAMeaOeb+FOQ+GEkG5eMj6P3Lz0KtIY38PTSTqNLOA=",
   "Source": "POS.Web",
   "BasePath": "_content/POS.Web",
   "Mode": "Default",
@@ -80,6 +80,27 @@
       "OriginalItemSpec": "wwwroot\\css\\product.css"
     },
     {
+      "Identity": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\sale.css",
+      "SourceId": "POS.Web",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\",
+      "BasePath": "_content/POS.Web",
+      "RelativePath": "css/sale#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "8l9v5hx1gd",
+      "Integrity": "TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\sale.css"
+    },
+    {
       "Identity": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\site.css",
       "SourceId": "POS.Web",
       "SourceType": "Discovered",
@@ -122,12 +143,12 @@
       "OriginalItemSpec": "wwwroot\\favicon.ico"
     },
     {
-      "Identity": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
+      "Identity": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale-functions.js",
       "SourceId": "POS.Web",
       "SourceType": "Discovered",
       "ContentRoot": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\",
       "BasePath": "_content/POS.Web",
-      "RelativePath": "js/sale#[.{fingerprint}]?.js",
+      "RelativePath": "js/sale-functions#[.{fingerprint}]?.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -136,11 +157,11 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "u4mn9edwsa",
-      "Integrity": "zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY=",
+      "Fingerprint": "orhl6o7uep",
+      "Integrity": "NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\js\\sale.js"
+      "OriginalItemSpec": "wwwroot\\js\\sale-functions.js"
     },
     {
       "Identity": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\site.js",
@@ -1508,6 +1529,88 @@
       ]
     },
     {
+      "Route": "css/sale.8l9v5hx1gd.css",
+      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\sale.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4432"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 07 Dec 2024 08:35:46 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "8l9v5hx1gd"
+        },
+        {
+          "Name": "label",
+          "Value": "css/sale.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs="
+        }
+      ]
+    },
+    {
+      "Route": "css/sale.css",
+      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\sale.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "4432"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 07 Dec 2024 08:35:46 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-TJve2XuXUvNKCE/RyR3YzewGuPPPIdAzZcKUh3xwLcs="
+        }
+      ]
+    },
+    {
       "Route": "css/site.css",
       "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\css\\site.css",
       "Selectors": [],
@@ -1672,8 +1775,8 @@
       ]
     },
     {
-      "Route": "js/sale.js",
-      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
+      "Route": "js/sale-functions.js",
+      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale-functions.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1682,7 +1785,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "15392"
+          "Value": "32684"
         },
         {
           "Name": "Content-Type",
@@ -1690,11 +1793,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY=\""
+          "Value": "\"NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 06 Dec 2024 08:18:26 GMT"
+          "Value": "Sat, 07 Dec 2024 13:49:54 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1704,13 +1807,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY="
+          "Value": "sha256-NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U="
         }
       ]
     },
     {
-      "Route": "js/sale.u4mn9edwsa.js",
-      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale.js",
+      "Route": "js/sale-functions.orhl6o7uep.js",
+      "AssetFile": "D:\\myApp\\POS\\POSSystem\\POS.Web\\wwwroot\\js\\sale-functions.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -1719,7 +1822,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "15392"
+          "Value": "32684"
         },
         {
           "Name": "Content-Type",
@@ -1727,11 +1830,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY=\""
+          "Value": "\"NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 06 Dec 2024 08:18:26 GMT"
+          "Value": "Sat, 07 Dec 2024 13:49:54 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -1741,15 +1844,15 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "u4mn9edwsa"
+          "Value": "orhl6o7uep"
         },
         {
           "Name": "label",
-          "Value": "js/sale.js"
+          "Value": "js/sale-functions.js"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-zkC8oqmoNZBnRJm33ZUfshn4edq+sdwEwfYcIF3bKNY="
+          "Value": "sha256-NGMfOys7/49UohuyYGpCHhpPzBQmLpK9k3zmVb/Fq9U="
         }
       ]
     },

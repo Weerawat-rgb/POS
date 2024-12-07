@@ -1,0 +1,250 @@
+/* Category container styles */
+.category-container {
+    height: 100vh;
+    max-height: calc(100vh - 2rem);
+}
+
+.category-title {
+    color: #388E3C;
+}
+
+.category-list {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100% - 4rem);
+    padding-right: 0.5rem;
+}
+
+/* Category button styles */
+.category-button {
+    background: linear-gradient(45deg, #fff5e6, #fff9f0);
+    transition: all 0.3s;
+    padding: 0.8rem 1.2rem;
+    min-height: 3.5rem;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.category-button:hover {
+    background: linear-gradient(45deg, #ffdb4d, #ffc107);
+}
+
+.category-name {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.category-count-badge {
+    background-color: #4CAF50;
+}
+
+/* Custom scrollbar styles */
+.category-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.category-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.category-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+
+.row {
+    margin: 0;
+    width: 100%;
+}
+
+#categoryProducts {
+    padding: 0.25rem !important;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 4px;
+}
+.product-card {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.product-card:not([disabled]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+.product-card:not([disabled]):active {
+    transform: translateY(0);
+}
+
+.product-card[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.receipt-container {
+    padding-bottom: 70px !important;
+}
+
+.product-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: white;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.product-card .card-img-top {
+    transition: all 0.3s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.add-to-cart {
+    opacity: 0.9;
+    transition: all 0.2s ease;
+}
+
+.product-card:hover .add-to-cart {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.add-to-cart:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar */
+#categoryProducts::-webkit-scrollbar {
+    width: 8px;
+}
+
+#categoryProducts::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#categoryProducts::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+#categoryProducts::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Responsive grid adjustments */
+@media (min-width: 1400px) {
+    .row-cols-lg-4>* {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+}
+
+@media (min-width: 1600px) {
+    .row-cols-xl-5>* {
+        flex: 0 0 auto;
+        width: 20%;
+    }
+}
+
+
+.hover-scale {
+    transition: transform 0.2s;
+}
+
+.hover-scale:hover {
+    transform: translateY(-2px);
+}
+
+.receipt-table {
+    font-size: 0.9rem;
+}
+
+.receipt-table td {
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed #dee2e6;
+}
+
+.sticky-top {
+    background: white;
+    backdrop-filter: blur(8px);
+}
+
+.product-item {
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.no-products {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.error {
+    color: red;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #ffe6e6;
+    border-radius: 4px;
+}
+
+#loading {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+@keyframes highlightFadeOut {
+    0% {
+        background-color: #FFE4B5;
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+.highlight-cart-row {
+    animation: highlightFadeOut 2s ease-out;
+}
+
+.overflow-auto {
+    max-height: calc(100vh - 300px); /* ปรับตามความเหมาะสม */
+    scrollbar-width: thin;
+}
+
+#cartTableBody tr {
+    transition: background-color 0.3s ease-out;
+}
+
+#cartTableBody tr.highlight-cart-row {
+    background-color: #FFE4B5;
+    transition: none;
+}
+
+.overflow-auto {
+    max-height: calc(100vh - 300px);
+    scrollbar-width: thin;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: white;
+}
