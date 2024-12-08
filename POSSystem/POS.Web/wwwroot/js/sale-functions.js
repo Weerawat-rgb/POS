@@ -30,7 +30,7 @@ async function searchProduct(barcode) {
     if (!barcode) return;
 
     try {
-        const response = await fetch(`/Sale/SearchProduct?barcode=${barcode}`);
+        const response = await fetch(`/Sale/SearchProducts?searchTerm=${searchTerm || ''}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -194,20 +194,17 @@ function loadCategories() {
     $.ajax({
         url: '/Sale/GetCategories',
         method: 'GET',
+        dataType: 'json',
         success: function (response) {
             if (response.success) {
-                // สร้าง HTML สำหรับปุ่มหมวดหมู่
-                let html = response.categories.map(category => `
-                    <button class="btn btn-outline-primary w-100 text-start mb-2" 
+                const categoryList = document.getElementById('category-list');
+                categoryList.innerHTML = response.categories.map(category => `
+                    <button class="category-button rounded-pill border-0 w-100 text-start" 
                             onclick="loadProductsByCategory(${category.id})">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span>${category.name}</span>
-                            <span class="badge bg-primary rounded-pill">${category.productCount || 0}</span>
-                        </div>
+                        <span class="category-name">${category.name}</span>
+                        <span class="badge rounded-pill category-count-badge">${category.productCount || 0}</span>
                     </button>
                 `).join('');
-
-                $('.d-flex.flex-column.gap-2').html(html);
 
                 // โหลดสินค้าของหมวดหมู่แรก (ถ้ามี)
                 if (response.categories.length > 0) {
@@ -221,8 +218,17 @@ function loadCategories() {
     });
 }
 
-// ฟังก์ชันโหลดสินค้าตามหมวดหมู่
+function handleCategoryClick(categoryId) {
+    // ลบ active state จากทุกปุ่ม
+    $('.btn-outline-primary').removeClass('active');
+    // เพิ่ม active state ให้ปุ่มที่ถูกคลิก
+    $(`button[onclick*="${categoryId}"]`).addClass('active');
+}
+
+
 async function loadProductsByCategory(categoryId) {
+    handleCategoryClick(categoryId);
+    // setActiveCategory(categoryId);
     try {
         const loadingDiv = document.getElementById('loading');
         if (loadingDiv) loadingDiv.style.display = 'block';
@@ -242,40 +248,44 @@ async function loadProductsByCategory(categoryId) {
         const categoryProducts = document.getElementById('categoryProducts');
         if (!categoryProducts) return;
 
-        const productsHtml = result.products.map(product => {
-            const productJson = JSON.stringify(product).replace(/'/g, '&#39;');
-            return `
-                <div class="col">
-                    <div class="card border-0 shadow-sm product-card h-100"
-                        style="transition: all 0.2s; cursor: pointer;"
-                        onclick='addToCart(${productJson})' ${product.stock <= 0 ? 'disabled' : ''}>
-                        
-                        <div class="position-relative">
-                            ${product.imageBase64 ?
-                    `<img src="data:${product.imageType};base64,${product.imageBase64}"
-                                    class="card-img-top p-2" style="height: 140px; object-fit: contain;"
+        const productsHtml = result.products.map(product => `
+            <div class="col">
+                <div class="card border-0 shadow-sm product-card h-100 ${product.status === false ? 'opacity-75' : ''}"
+                    style="transition: all 0.2s; cursor: pointer;"
+                    onclick="${product.status === false ? 'void(0)' : `addToCart(${product.id})`}">
+                    
+                    <div class="position-relative">
+                        ${product.imageBase64 ?
+                `<img src="data:${product.imageType};base64,${product.imageBase64}"
+                                    class="card-img-top p-2" 
+                                    style="height: 140px; object-fit: contain;"
                                     alt="${product.name}">` :
-                    `<div class="d-flex align-items-center justify-content-center bg-light"
+                `<div class="d-flex align-items-center justify-content-center bg-light"
                                     style="height: 140px;">
                                     <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
                                 </div>`
-                }
-                        </div>
-
-                        <div class="card-body p-2 d-flex flex-column justify-content-center align-items-center text-center">
-                            <h6 class="card-title text-truncate mb-1 w-100" style="font-size: 0.9rem;">
-                                ${product.name}
+            }
+                        ${product.status === false ?
+                `<div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-danger">ปิดการขายชั่วคราว</span>
+                             </div>` :
+                ''
+            }
+                    </div>
+        
+                    <div class="card-body p-2 d-flex flex-column justify-content-center align-items-center text-center">
+                        <h6 class="card-title text-truncate mb-1 w-100" style="font-size: 0.9rem;">
+                            ${product.name}
+                        </h6>
+                        <div class="pt-2">
+                            <h6 class="mb-0" style="color: #4CAF50; font-size: 0.95rem;">
+                                ฿${product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </h6>
-                            <div class="pt-2">
-                                <h6 class="mb-0" style="color: #4CAF50; font-size: 0.95rem;">
-                                    ฿${product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </h6>
-                            </div>
                         </div>
                     </div>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `).join('');
 
         categoryProducts.innerHTML = `
             <div class="row row-cols-4 row-cols-xl-5 row-cols-xxl-6 g-2">
@@ -298,33 +308,59 @@ async function loadProductsByCategory(categoryId) {
 }
 
 
-// // เพิ่มฟังก์ชันสำหรับเพิ่มสินค้าลงตะกร้า (ถ้ายังไม่มี)
-// function addToCart(productId, productName, price) {
-//     // โค้ดสำหรับเพิ่มสินค้าลงตะกร้า
-//     console.log('เพิ่มสินค้า:', { productId, productName, price });
+
+// function displayProducts(products) {
+//     const productsHtml = products.map(product => `
+//         <div class="col">
+//             <div class="card border-0 shadow-sm product-card h-100 ${product.status === false ? 'opacity-75' : ''}"
+//                 style="transition: all 0.2s; cursor: pointer;"
+//                 onclick="${product.status === false ? 'void(0)' : `addToCart(${product.id})`}">
+
+//                 <div class="position-relative">
+//                     ${product.imageBase64 ?
+//                         `<img src="data:${product.imageType};base64,${product.imageBase64}"
+//                                 class="card-img-top p-2" 
+//                                 style="height: 140px; object-fit: contain;"
+//                                 alt="${product.name}">` :
+//                         `<div class="d-flex align-items-center justify-content-center bg-light"
+//                                 style="height: 140px;">
+//                                 <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+//                             </div>`
+//                     }
+//                     ${product.status === false ? 
+//                         `<div class="position-absolute top-0 end-0 m-2">
+//                             <span class="badge bg-danger">ปิดการขายชั่วคราว</span>
+//                          </div>` : 
+//                         ''
+//                     }
+//                 </div>
+
+//                 <div class="card-body p-2 d-flex flex-column justify-content-center align-items-center text-center">
+//                     <h6 class="card-title text-truncate mb-1 w-100" style="font-size: 0.9rem;">
+//                         ${product.name}
+//                     </h6>
+//                     <div class="pt-2">
+//                         <h6 class="mb-0" style="color: #4CAF50; font-size: 0.95rem;">
+//                             ฿${product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+//                         </h6>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     `).join('');
+
+//     return productsHtml;
 // }
 
-function displayProducts(products) {
-    clearError();
+// // ใช้ฟังก์ชัน displayProducts ในการโหลดครั้งแรก
+// $(document).ready(function () {
+//     const initialProducts = Html.Raw(Json.Serialize(ViewBag.Products));
+//     const productsContainer = document.getElementById('categoryProducts');
+//     if (productsContainer && initialProducts) {
+//         productsContainer.innerHTML = displayProducts(initialProducts);
+//     }
+// });
 
-    const productList = document.getElementById('product-list');
-    productList.innerHTML = '';
-
-    if (!products || products.length === 0) {
-        productList.innerHTML = '<div class="no-products">ไม่พบสินค้าในหมวดหมู่นี้</div>';
-        return;
-    }
-
-    products.forEach(product => {
-        const productItem = document.createElement('div');
-        productItem.className = 'product-item';
-        productItem.innerHTML = `
-            <h3>${product.name}</h3>
-            <p>ราคา: ${product.price.toLocaleString()} บาท</p>
-        `;
-        productList.appendChild(productItem);
-    });
-}
 
 function clearError() {
     const errorDiv = document.getElementById('error-message');
@@ -343,71 +379,112 @@ function displayError(message) {
 }
 
 
-document.addEventListener('wheel', function (e) {
-    if (!e.target.closest('.scrollable')) {
-        e.preventDefault();
-    }
-}, { passive: false });
-
-
-function addToCart(product) {
-    const cartTableBody = document.getElementById('cartTableBody');
-
-    // ตรวจสอบว่าสินค้านี้มีในตะกร้าแล้วหรือไม่
-    const existingRow = document.querySelector(`tr[data-product-id="${product.id}"]`);
-
-    if (existingRow) {
-        // เพิ่มจำนวน
-        const quantityInput = existingRow.querySelector('input[type="number"]');
-        quantityInput.value = parseInt(quantityInput.value) + 1;
-
-        // อัพเดทยอดรวม
-        updateTotal(existingRow);
-
-        // เพิ่ม highlight
-        existingRow.classList.remove('highlight-cart-row');  // ลบ class เดิม (ถ้ามี)
-        void existingRow.offsetWidth;  // Trigger reflow
-        existingRow.classList.add('highlight-cart-row');  // เพิ่ม class ใหม่
-
-        // เลื่อนไปที่แถวนั้น
-        existingRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-    } else {
-        // สร้างแถวใหม่
-        const newRow = document.createElement('tr');
-        newRow.dataset.productId = product.id;
-
-        newRow.innerHTML = `
-            <td>${product.name}</td>
-            <td class="text-end">฿${product.price.toFixed(2)}</td>
-            <td class="text-center">
-                <input type="number" class="form-control form-control-sm text-center p-1" 
-                    value="1" min="1" style="width: 60px;" 
-                    onchange="updateQuantity(this, ${product.id}, ${product.price})">
-            </td>
-            <td class="text-end">฿${product.price.toFixed(2)}</td>
-            <td class="text-center">
-                <button class="btn btn-sm text-danger" onclick="removeFromCart(${product.id})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-
-        // เพิ่มแถวใหม่ที่บนสุด
-        cartTableBody.insertBefore(newRow, cartTableBody.firstChild);
-
-        // เพิ่ม highlight
-        newRow.classList.add('highlight-cart-row');
-
-        // เลื่อนไปบนสุด
-        const container = cartTableBody.closest('.overflow-auto');
-        if (container) {
-            container.scrollTop = 0;
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryList = document.querySelector('.category-list');
+    
+    // ตั้งค่า passive listeners เพื่อเพิ่มประสิทธิภาพ
+    categoryList.addEventListener('touchstart', function() {}, { passive: true });
+    categoryList.addEventListener('touchmove', function() {}, { passive: true });
+    categoryList.addEventListener('touchend', function() {}, { passive: true });
+    
+    // ป้องกันการ scroll ของหน้าเว็บเมื่อ scroll ใน category list
+    categoryList.addEventListener('touchmove', function(e) {
+        if (this.scrollHeight > this.clientHeight) {
+            e.stopPropagation();
         }
-    }
+    }, { passive: false });
+});
 
-    // อัพเดทยอดรวมทั้งหมด
-    updateCartTotal();
+// function addToCart(productId) {
+//     $.ajax({
+//         url: '/Home/AddToCart',
+//         type: 'POST',
+//         data: { productId: productId },
+//         success: function(response) {
+//             if(response.success) {
+//                 $("#cartCount").text(response.cartCount);
+//                 Swal.fire({
+//                     title: 'สำเร็จ',
+//                     text: 'เพิ่มสินค้าลงตะกร้าเรียบร้อย',
+//                     icon: 'success',
+//                     timer: 1500,
+//                     showConfirmButton: false
+//                 });
+//             }
+//         }
+//     });
+// }
+
+
+function addToCart(productId) {
+    $.ajax({
+        url: `/Sale/GetProductById`,
+        type: 'GET',
+        data: { id: productId },
+        success: function (product) {
+            const cartTableBody = document.getElementById('cartTableBody');
+
+            // ตรวจสอบว่าสินค้านี้มีในตะกร้าแล้วหรือไม่
+            const existingRow = document.querySelector(`tr[data-product-id="${productId}"]`);
+
+            if (existingRow) {
+                // เพิ่มจำนวน
+                const quantityInput = existingRow.querySelector('input[type="number"]');
+                quantityInput.value = parseInt(quantityInput.value) + 1;
+
+                // อัพเดทยอดรวม
+                updateTotal(existingRow);
+
+                // เพิ่ม highlight
+                existingRow.classList.remove('highlight-cart-row');
+                void existingRow.offsetWidth;
+                existingRow.classList.add('highlight-cart-row');
+
+                // เลื่อนไปที่แถวนั้น
+                existingRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            } else {
+                // สร้างแถวใหม่
+                const newRow = document.createElement('tr');
+                newRow.dataset.productId = productId;
+
+                newRow.innerHTML = `
+                    <td>${product.name}</td>
+                    <td class="text-end">฿${product.price.toFixed(2)}</td>
+                    <td class="text-center">
+                        <input type="number" class="form-control form-control-sm text-center p-1" 
+                            value="1" min="1" style="width: 60px;" 
+                            onchange="updateQuantity(this, ${productId}, ${product.price})">
+                    </td>
+                    <td class="text-end">฿${product.price.toFixed(2)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm text-danger" onclick="removeFromCart(${productId})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+
+                // เพิ่มแถวใหม่ที่บนสุด
+                cartTableBody.insertBefore(newRow, cartTableBody.firstChild);
+
+                // เพิ่ม highlight
+                newRow.classList.add('highlight-cart-row');
+
+                // เลื่อนไปบนสุด
+                const container = cartTableBody.closest('.overflow-auto');
+                if (container) {
+                    container.scrollTop = 0;
+                }
+            }
+
+            // อัพเดทยอดรวมทั้งหมด
+            updateCartTotal();
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching product:', error);
+            alert('ไม่สามารถเพิ่มสินค้าได้');
+        }
+    });
 }
 
 function updateTotal(row) {
@@ -461,57 +538,63 @@ function removeFromCart(productId) {
     }
 }
 
-// ฟังก์ชันโหลดหมวดหมู่
-async function loadCategories() {
-    try {
-        const loadingDiv = document.getElementById('loading');
-        if (loadingDiv) loadingDiv.style.display = 'block';
+$(document).ready(function () {
+    // เรียก loadCategories เพื่อโหลดหมวดหมู่และสินค้าแรก
+    loadCategories();
+});
 
-        const response = await fetch('http://localhost:5292/Sale/GetCategories');
+function loadCategories() {
+    $.ajax({
+        url: '/Sale/GetCategories',
+        method: 'GET',
+        success: function (response) {
+            if (response.success) {
+                // สร้าง HTML สำหรับปุ่มหมวดหมู่
+                let html = response.categories.map(category => `
+                    <button class="btn btn-outline-primary w-100 text-start mb-2" 
+                            onclick="loadProductsByCategory(${category.id})">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>${category.name}</span>
+                            <span class="badge bg-primary rounded-pill">${category.productCount || 0}</span>
+                        </div>
+                    </button>
+                `).join('');
 
-        if (!response.ok) {
-            throw new Error('เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่: ' + response.status);
+                $('.d-flex.flex-column.gap-2').html(html);
+
+                // โหลดสินค้าของหมวดหมู่แรก (ถ้ามี)
+                if (response.categories.length > 0) {
+                    loadProductsByCategory(response.categories[0].id);
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error loading categories:', error);
         }
-
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(result.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
-        }
-
-        displayCategories(result.categories);
-
-    } catch (error) {
-        console.error('เกิดข้อผิดพลาด:', error);
-        displayError(error.message);
-    } finally {
-        const loadingDiv = document.getElementById('loading');
-        if (loadingDiv) loadingDiv.style.display = 'none';
-    }
-}
-
-
-function displayProducts(products) {
-    clearError();
-
-    const productList = document.getElementById('product-list');
-    productList.innerHTML = '';
-
-    if (!products || products.length === 0) {
-        productList.innerHTML = '<div class="no-products">ไม่พบสินค้าในหมวดหมู่นี้</div>';
-        return;
-    }
-
-    products.forEach(product => {
-        const productItem = document.createElement('div');
-        productItem.className = 'product-item';
-        productItem.innerHTML = `
-            <h3>${product.name}</h3>
-            <p>ราคา: ${product.price.toLocaleString()} บาท</p>
-        `;
-        productList.appendChild(productItem);
     });
 }
+
+// function displayProducts(products) {
+//     clearError();
+
+//     const productList = document.getElementById('product-list');
+//     productList.innerHTML = '';
+
+//     if (!products || products.length === 0) {
+//         productList.innerHTML = '<div class="no-products">ไม่พบสินค้าในหมวดหมู่นี้</div>';
+//         return;
+//     }
+
+//     products.forEach(product => {
+//         const productItem = document.createElement('div');
+//         productItem.className = 'product-item';
+//         productItem.innerHTML = `
+//             <h3>${product.name}</h3>
+//             <p>ราคา: ${product.price.toLocaleString()} บาท</p>
+//         `;
+//         productList.appendChild(productItem);
+//     });
+// }
 
 function displayCategories(categories) {
     clearError();
@@ -567,31 +650,31 @@ function hideLoadingState() {
     // Implementation depends on your loading UI
 }
 
-// Helper function to display products
-function displayProducts(products) {
-    const productContainer = document.getElementById('productContainer');
-    if (!productContainer) return;
+// // Helper function to display products
+// function displayProducts(products) {
+//     const productContainer = document.getElementById('productContainer');
+//     if (!productContainer) return;
 
-    if (products.length === 0) {
-        productContainer.innerHTML = '<div class="alert alert-info">ไม่พบสินค้าในหมวดหมู่นี้</div>';
-        return;
-    }
+//     if (products.length === 0) {
+//         productContainer.innerHTML = '<div class="alert alert-info">ไม่พบสินค้าในหมวดหมู่นี้</div>';
+//         return;
+//     }
 
-    const productsHTML = products.map(product => `
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}">
-                <div class="card-body">
-                    <h5 class="card-title">${product.name}</h5>
-                    <p class="card-text">${product.price.toLocaleString('th-TH', { style: 'currency', currency: 'THB' })}</p>
-                    <button onclick="addToCart(${product.id})" class="btn btn-primary">เพิ่มลงตะกร้า</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+//     const productsHTML = products.map(product => `
+//         <div class="col-md-4 mb-4">
+//             <div class="card h-100">
+//                 <img src="${product.imageUrl}" class="card-img-top" alt="${product.name}">
+//                 <div class="card-body">
+//                     <h5 class="card-title">${product.name}</h5>
+//                     <p class="card-text">${product.price.toLocaleString('th-TH', { style: 'currency', currency: 'THB' })}</p>
+//                     <button onclick="addToCart(${product.id})" class="btn btn-primary">เพิ่มลงตะกร้า</button>
+//                 </div>
+//             </div>
+//         </div>
+//     `).join('');
 
-    productContainer.innerHTML = `<div class="row">${productsHTML}</div>`;
-}
+//     productContainer.innerHTML = `<div class="row">${productsHTML}</div>`;
+// }
 
 // Helper function to update active category button
 function updateActiveCategoryButton(categoryId) {
@@ -665,74 +748,154 @@ function debounce(func, wait) {
     };
 }
 
-// ปรับฟังก์ชัน searchProducts ให้รองรับ realtime
 $(document).ready(function () {
+    let currentIndex = -1;
+    let searchResults = [];
+
     const debouncedSearch = debounce(function (value) {
-        if (value.length >= 1) { // เริ่มค้นหาเมื่อพิมพ์อย่างน้อย 1 ตัวอักษร
+        if (value.length >= 1) {
             $.get('/Sale/SearchProducts', { searchTerm: value })
                 .done(function (response) {
                     if (response.success) {
-                        if (!response.products || response.products.length === 0) {
+                        searchResults = response.products || [];
+
+                        if (searchResults.length === 0) {
                             $('#searchResults').html('<div class="alert alert-info">ไม่พบสินค้า</div>');
+                            currentIndex = -1;
                             return;
                         }
 
-                        if (response.products.length === 1) {
-                            addToCart(response.products[0]);
-                            $('#barcodeInput').val(''); // เคลียร์ช่องค้นหา
-                            $('#searchResults').empty(); // ซ่อนผลการค้นหา
+                        if (searchResults.length === 1) {
+                            addToCart(searchResults[0].id);
+                            clearSearch();
                         } else {
-                            // แสดงผลการค้นหาใต้ช่องค้นหา
-                            showSearchResults(response.products);
+                            currentIndex = -1;
+                            showSearchResults(searchResults);
                         }
                     } else {
                         $('#searchResults').html(`<div class="alert alert-danger">${response.message || 'เกิดข้อผิดพลาดในการค้นหา'}</div>`);
+                        currentIndex = -1;
                     }
                 })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                     $('#searchResults').html(`<div class="alert alert-danger">เกิดข้อผิดพลาดในการเชื่อมต่อ: ${errorThrown || 'Unknown error'}</div>`);
+                    currentIndex = -1;
                 });
         } else {
-            $('#searchResults').empty(); // ซ่อนผลการค้นหาเมื่อไม่มีข้อความ
+            clearSearch();
         }
-    }, 300); // รอ 300ms หลังจากพิมพ์เสร็จ
+    }, 300);
 
-    // เพิ่ม event listener สำหรับการพิมพ์
+    // แยกการจัดการ keydown เป็นฟังก์ชันใหม่
+    function handleKeydown(e) {
+        const items = $('.search-result-item');
+        const totalItems = items.length;
+
+        if (totalItems === 0) return;
+
+        switch (e.key) {
+            case 'ArrowUp':
+                e.preventDefault();
+                currentIndex = currentIndex <= 0 ? totalItems - 1 : currentIndex - 1;
+                highlightItem(items);
+                break;
+
+            case 'ArrowDown':
+                e.preventDefault();
+                currentIndex = currentIndex >= totalItems - 1 ? 0 : currentIndex + 1;
+                highlightItem(items);
+                break;
+
+            case 'Enter':
+                e.preventDefault();
+                if (currentIndex >= 0 && currentIndex < searchResults.length) {
+                    selectAndAddToCart(searchResults[currentIndex].id, currentIndex);
+                }
+                break;
+
+            case 'Escape':
+                e.preventDefault();
+                clearSearch();
+                break;
+        }
+    }
+
+    // เพิ่ม event listener สำหรับ keydown
+    $('#barcodeInput').on('keydown', handleKeydown);
+
     $('#barcodeInput').on('input', function () {
         const value = $(this).val()?.trim() ?? "";
         debouncedSearch(value);
     });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#searchContainer').length) {
+            clearSearch();
+        }
+    });
 });
 
-
-// ฟังก์ชันแสดงผลการค้นหาแบบ dropdown
 function showSearchResults(products) {
-    currentSelection = -1; // reset selection
-
-    const resultsHtml = `
-                        <div class="list-group mt-2">
-                            ${products.map((p, index) => `
-                                <button type="button" 
-                                    class="list-group-item list-group-item-action py-2" 
-                                    data-product='${JSON.stringify(p)}'
-                                    data-index="${index}"
-                                    onmouseover="handleMouseOver(${index})"
-                                    onclick='selectProduct(${JSON.stringify(p)})'>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div><strong>${p.barcode || 'ไม่มีบาร์โค้ด'}</strong> - ${p.name || 'ไม่มีชื่อ'}</div>
-                                            <small class="text-muted">
-                                                หมวดหมู่: ${p.categoryName || 'ไม่ระบุ'} | 
-                                                คงเหลือ: ${p.stock ?? 0} ชิ้น
-                                            </small>
-                                        </div>
-                                        <div class="text-primary fw-bold">${p.price ?? 0} บาท</div>
-                                    </div>
-                                </button>
-                            `).join('')}
+    const html = products.map((product, index) => {
+        return `
+        <div class="search-result-item" data-index="${index}">
+            <div class="d-flex align-items-center p-3">
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="fw-medium" style="color: #2E7D32;">
+                                ${product.name}
+                                ${!product.status ?
+                '<span class="ms-2 badge bg-danger-subtle text-danger rounded-pill">ปิดขายชั่วคราว</span>' :
+                ''}
+                            </div>
                         </div>
-                        `;
-    $('#searchResults').html(resultsHtml);
+                        <div class="fw-bold" style="color: #4CAF50;">
+                            ฿${product.price.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    $('#searchResults').html(`
+        <div class="search-results-container">
+            ${html}
+        </div>
+    `);
+
+    // Add click handlers
+    $('.search-result-item').on('click', function () {
+        const index = $(this).data('index');
+        addToCart(searchResults[index].id);
+        clearSearch();
+    });
+}
+
+function highlightItem(items) {
+    items.removeClass('active');
+    const selectedItem = items.eq(currentIndex);
+    if (selectedItem.length) {
+        selectedItem.addClass('active');
+        selectedItem[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+}
+
+function clearSearch() {
+    $('#barcodeInput').val('');
+    $('#searchResults').empty();
+    currentIndex = -1;
+    searchResults = [];
+}
+
+function selectAndAddToCart(productId, index) {
+    addToCart(productId);
+    clearSearch();
 }
 
 function handleMouseOver(index) {

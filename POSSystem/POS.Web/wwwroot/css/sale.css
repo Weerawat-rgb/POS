@@ -1,67 +1,106 @@
-/* Category container styles */
+/* ปรับสีปุ่มให้เป็นโทนเขียว */
+.btn-outline-primary {
+    --bs-btn-color: #4CAF50 !important;
+    --bs-btn-border-color: #4CAF50 !important;
+    --bs-btn-hover-color: #fff !important;
+    --bs-btn-hover-bg: #4CAF50 !important;
+    --bs-btn-hover-border-color: #4CAF50 !important;
+    --bs-btn-focus-shadow-rgb: 76, 175, 80 !important;
+    --bs-btn-active-color: #fff !important;
+    --bs-btn-active-bg: #4CAF50 !important;
+    --bs-btn-active-border-color: #4CAF50 !important;
+}
+
+/* ปรับสี badge ให้เข้ากัน */
+.bg-primary {
+    background-color: #4CAF50 !important;
+}
+
+/* ปรับสีเมื่อ active */
+.btn-outline-primary.active {
+    color: white !important;
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+}
+
+/* ปรับสี badge เมื่อปุ่ม hover */
+.btn-outline-primary:hover .badge {
+    background-color: white !important;
+    color: #4CAF50 !important;
+}
+/* ตั้งค่าความสูงและทำให้ scroll ได้ */
+.category-list {
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding-right: 5px;
+    
+    /* เพิ่ม properties สำหรับ touch devices */
+    -webkit-overflow-scrolling: touch; /* สำหรับ iOS */
+    touch-action: pan-y; /* อนุญาตให้เลื่อนแนวตั้งบน touch devices */
+    overscroll-behavior: contain; /* ควบคุมพฤติกรรม scroll เกินขอบเขต */
+}
+
+/* สำหรับ touch devices โดยเฉพาะ */
+@media (hover: none) and (pointer: coarse) {
+    .category-list {
+        overflow-y: scroll; /* บังคับให้แสดง scrollbar บน touch devices */
+        scrollbar-width: thin; /* สำหรับ Firefox */
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ป้องกันการ scroll เกินขอบเขต */
 .category-container {
     height: 100vh;
-    max-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+    overscroll-behavior: contain;
 }
 
-.category-title {
-    color: #388E3C;
-}
-
-.category-list {
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: calc(100% - 4rem);
-    padding-right: 0.5rem;
-}
-
-/* Category button styles */
-.category-button {
-    background: linear-gradient(45deg, #fff5e6, #fff9f0);
-    transition: all 0.3s;
-    padding: 0.8rem 1.2rem;
-    min-height: 3.5rem;
-    white-space: normal;
-    word-wrap: break-word;
-}
-
-.category-button:hover {
-    background: linear-gradient(45deg, #ffdb4d, #ffc107);
-}
-
-.category-name {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.category-count-badge {
-    background-color: #4CAF50;
-}
-
-/* Custom scrollbar styles */
-.category-list::-webkit-scrollbar {
-    width: 6px;
-}
-
+/* แต่งพื้นหลังของ scrollbar */
 .category-list::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
 }
 
+/* แต่ง scrollbar ตัวเลื่อน */
+.category-list::-webkit-scrollbar {
+    width: 6px;
+}
+
 .category-list::-webkit-scrollbar-thumb {
-    background: #888;
+    background: #4CAF50;
     border-radius: 10px;
 }
 
+/* hover effect บน scrollbar */
+.category-list::-webkit-scrollbar-thumb:hover {
+    background: #45a049;
+}
+
+/* สำหรับ Firefox */
+.category-list {
+    scrollbar-width: thin;
+    scrollbar-color: #4CAF50 #f1f1f1;
+}
+
+/* ทำให้ container หลักมีความสูงเต็ม */
+.category-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* จัดการพื้นที่ส่วนหัว */
+.category-title {
+    flex-shrink: 0; /* ป้องกันไม่ให้ส่วนหัวหด */
+}
 
 .row {
     margin: 0;
     width: 100%;
 }
 
-#categoryProducts {
-    padding: 0.25rem !important;
-}
 
 .product-card {
     border: 1px solid #ddd;
@@ -126,24 +165,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Custom scrollbar */
-#categoryProducts::-webkit-scrollbar {
-    width: 8px;
-}
-
-#categoryProducts::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-#categoryProducts::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-
-#categoryProducts::-webkit-scrollbar-thumb:hover {
-    background: #999;
-}
 
 /* Responsive grid adjustments */
 @media (min-width: 1400px) {
@@ -247,4 +268,83 @@
     top: 0;
     z-index: 1;
     background-color: white;
+}
+
+#searchContainer {
+    z-index: 1050;
+}
+
+.search-results-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    margin-top: 4px;
+}
+
+.search-result-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #F6FBF6;
+}
+
+.search-result-item.active {
+    background-color: #E8F5E9;
+}
+
+/* Customize scrollbar */
+.search-results-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.search-results-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.search-results-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Animation for dropdown */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-results-container {
+    animation: slideDown 0.2s ease-out;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.65em;
+}
+
+.position-absolute {
+    z-index: 2;
 }

@@ -56,31 +56,6 @@ html {
   color: #6c757d;
 }
 
-.category-buttons {
-  width: 300px;
-}
-
-.category-buttons .btn {
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#categoryProducts {
-  margin-left: 0px;
-}
-
-@media (max-width: 768px) {
-  .category-buttons {
-      width: 100%;
-      margin-bottom: 1rem;
-  }
-  #categoryProducts {
-      margin-left: 0;
-  }
-}
-
 /* ใส่ใน site.css */
 body {
   padding-top: 0px; /* ความสูงรวมของ navbar และ search bar */
@@ -212,40 +187,6 @@ body {
 
 .scrollable::-webkit-scrollbar-thumb:hover {
     background: #666;
-}
-
-/* ใน site.css */
-.category-button {
-  text-align: left;
-  padding: 8px 12px;
-  width: 100%;
-  border: none;
-  background-color: transparent;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.2s;
-}
-
-.category-button:hover {
-  background-color: #f0f0f0;
-}
-
-.category-button.active {
-  background-color: #e3f2fd;
-  color: #0d6efd;
-}
-
-.category-button .badge {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
-}
-
-/* ปรับขนาดพื้นที่เมนูด้านซ้าย */
-#categoryList {
-  padding: 0;  /* ลบ padding */
 }
 
 .col-2.bg-white.shadow-sm.scrollable {

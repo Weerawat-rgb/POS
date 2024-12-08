@@ -4,7 +4,6 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/sale.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
 }
 
 @section Scripts {
@@ -15,21 +14,21 @@
     <!-- Left Section (2/3) -->
     <div class="col-md-8 d-flex flex-column bg-gradient"
         style="background: linear-gradient(135deg, #F6FBF6 0%, #fff 100%)">
-        <!-- Search Bar -->
+        <!-- Search Bar Container -->
         <div class="p-3 border-bottom bg-white shadow-sm">
-            <div class="input-group input-group-lg">
-                <span class="input-group-text border-0 bg-white">
-                    <i class="bi bi-search" style="color: #4CAF50;"></i>
-                </span>
-                <input type="text" id="barcodeInput" class="form-control border-0 shadow-none"
-                    placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." style="background: #F6FBF6;" autofocus>
-            </div>
-            <!-- Search Results -->
-            <div id="searchResults" class="position-absolute shadow-lg bg-white rounded-3 mt-1"
-                style="z-index: 1000; width: calc(66.66% - 2rem); left: 1rem;">
+            <div id="searchContainer" class="position-relative">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text border-0 bg-white">
+                        <i class="bi bi-search" style="color: #4CAF50;"></i>
+                    </span>
+                    <input type="text" id="barcodeInput" class="form-control border-0 shadow-none"
+                        placeholder="สแกนบาร์โค้ดหรือค้นหาสินค้า..." style="background: #F6FBF6;" autocomplete="off"
+                        autofocus>
+                </div>
+                <!-- Search Results Dropdown -->
+                <div id="searchResults" class="w-100"></div>
             </div>
         </div>
-
         <!-- Products Area -->
         <div class="row g-0 flex-grow-1">
             <!-- Left Categories -->
@@ -57,8 +56,7 @@
                         {
                             <div class="col">
                                 <!-- ย้าย onclick มาที่ card หลัก และเพิ่ม cursor: pointer -->
-                                <div class="card border-0 shadow-sm product-card h-100"
-                                    onclick="addToCart(@Json.Serialize(product))" @(product.Stock <= 0 ? "disabled" : "")>
+                                <div class="card border-0 shadow-sm product-card h-100" onclick="addToCart(@product.Id)">
 
                                     <!-- Product Image -->
                                     <div class="position-relative">
